@@ -19,7 +19,10 @@ class Todos extends Component {
   };
 
   async componentDidMount() {
-    const res = await firestore.collection('todos').get();
+    const res = await firestore
+      .collection('todos')
+      .orderBy('createdAt', 'desc')
+      .get();
     const todos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
 
     this.setState({ todos });
@@ -59,21 +62,27 @@ class Todos extends Component {
 
   handleFormSubmit = (e) => {
     e.preventDefault();
+
+    // Add new todo
     if (!this.state.editState) {
       const todos = [
-        ...this.state.todos,
         {
           id: Math.floor(Math.random() * 1000000),
           text: this.state.formText,
           complete: false,
         },
+        ...this.state.todos,
       ];
 
-      firestore
-        .collection('todos')
-        .add({ text: this.state.formText, complete: false });
+      firestore.collection('todos').add({
+        text: this.state.formText,
+        complete: false,
+        createdAt: Date.now(),
+      });
 
       this.setState({ todos, formText: '' });
+
+      // Edit todo
     } else {
       const todos = this.state.todos.map((todo) => {
         if (this.state.editState.id === todo.id) {
