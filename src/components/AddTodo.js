@@ -8,11 +8,12 @@ const AddTodo = (props) => {
       <div className='input-field'>
         <input
           type='text'
+          className='grey lighten-5'
           id='text'
           value={formText}
           onChange={handleFormChange}
         />
-        <label htmlFor='text'></label>
+        <label htmlFor='text'>Add todo...</label>
       </div>
       <button className='btn'>{editState ? 'Edit' : 'Add'}</button>
     </form>

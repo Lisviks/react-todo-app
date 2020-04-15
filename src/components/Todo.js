@@ -24,7 +24,7 @@ const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
         <span>{todo.text}</span>
       </label>
       <button
-        className='btn btn-small secondary-content'
+        className='btn btn-small secondary-content red darken-1'
         onClick={handleDeleteClick}
       >
         Delete
