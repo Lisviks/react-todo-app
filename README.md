@@ -1,5 +1,31 @@
 # Simple React Todo App
 
+### Firebase config
+
+Create firebase.js file inside src/config folder and add this with your own config:
+
+```javascript
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+
+const conifg = {
+  apiKey: '',
+  authDomain: '',
+  databaseURL: '',
+  projectId: '',
+  storageBucket: '',
+  messagingSenderId: '',
+  appId: '',
+  measurementId: '',
+};
+
+firebase.initializeApp(conifg);
+
+export const firestore = firebase.firestore();
+
+export default firebase;
+```
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import Todo from './Todo';
 import AddTodo from './AddTodo';
+import { firestore } from '../config/firebase';
 
 class Todos extends Component {
   state = {
@@ -17,26 +18,32 @@ class Todos extends Component {
     localStorage.setItem('todos', JSON.stringify(todos));
   };
 
-  componentDidMount() {
-    const ls = localStorage.getItem('todos');
-    const todos = ls ? JSON.parse(ls) : [];
+  async componentDidMount() {
+    const res = await firestore.collection('todos').get();
+    const todos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+
     this.setState({ todos });
   }
 
   checkComplete = (id) => {
     const todos = [...this.state.todos];
     todos.map((todo) => {
-      if (todo.id === id) todo.complete = !todo.complete;
+      if (todo.id === id) {
+        todo.complete = !todo.complete;
+        firestore
+          .collection('todos')
+          .doc(id)
+          .update({ complete: todo.complete });
+      }
       return todo;
     });
     this.setState({ todos });
-    this.saveLocalStorage(todos);
   };
 
   deleteTodo = (id) => {
     const todos = this.state.todos.filter((todo) => todo.id !== id);
     this.setState({ todos });
-    this.saveLocalStorage(todos);
+    firestore.collection('todos').doc(id).delete();
   };
 
   startEdit = (id, text) => {
@@ -61,17 +68,25 @@ class Todos extends Component {
           complete: false,
         },
       ];
+
+      firestore
+        .collection('todos')
+        .add({ text: this.state.formText, complete: false });
+
       this.setState({ todos, formText: '' });
-      this.saveLocalStorage(todos);
     } else {
       const todos = this.state.todos.map((todo) => {
         if (this.state.editState.id === todo.id) {
           todo.text = this.state.formText;
+
+          firestore
+            .collection('todos')
+            .doc(todo.id)
+            .update({ text: todo.text });
         }
         return todo;
       });
       this.setState({ todos, formText: '', editState: null });
-      this.saveLocalStorage(todos);
     }
   };
 
