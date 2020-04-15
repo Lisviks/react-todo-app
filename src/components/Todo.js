@@ -1,13 +1,16 @@
 import React from 'react';
 
-const Todo = ({ todo, checkComplete }) => {
+const Todo = ({ todo, checkComplete, startEdit }) => {
   const handleChange = () => {
     checkComplete(todo.id);
-    console.log(todo);
+  };
+
+  const handleClick = () => {
+    startEdit(todo.id, todo.text);
   };
 
   return (
-    <li>
+    <li className='collection-item'>
       <label>
         <input
           type='checkbox'
@@ -16,6 +19,9 @@ const Todo = ({ todo, checkComplete }) => {
         />
         <span>{todo.text}</span>
       </label>
+      <button className='btn btn-small secondary-content' onClick={handleClick}>
+        Edit
+      </button>
     </li>
   );
 };

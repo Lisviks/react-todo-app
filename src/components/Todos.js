@@ -9,6 +9,8 @@ class Todos extends Component {
       { id: 2, text: 'Mow grass', complete: true },
       { id: 3, text: 'Read a book', complete: false },
     ],
+    formText: '',
+    editState: null,
   };
 
   checkComplete = (id) => {
@@ -18,28 +20,63 @@ class Todos extends Component {
       return todo;
     });
     this.setState({ todos });
-    console.log(this.state);
   };
 
-  addTodo = (text) => {
-    const todos = [
-      ...this.state.todos,
-      { id: Math.floor(Math.random() * 1000000), text, complete: false },
-    ];
-    this.setState({ todos });
+  startEdit = (id, text) => {
+    this.setState({
+      editState: this.state.todos.filter((todo) => todo.id === id)[0],
+      formText: text,
+    });
+  };
+
+  handleFormChange = (e) => {
+    this.setState({ formText: e.target.value });
+  };
+
+  handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (!this.state.editState) {
+      const todos = [
+        ...this.state.todos,
+        {
+          id: Math.floor(Math.random() * 1000000),
+          text: this.state.formText,
+          complete: false,
+        },
+      ];
+      this.setState({ todos, formText: '' });
+    } else {
+      const todos = this.state.todos.map((todo) => {
+        if (this.state.editState.id === todo.id) {
+          todo.text = this.state.formText;
+        }
+        return todo;
+      });
+      this.setState({ todos, formText: '' });
+    }
   };
 
   render() {
     const todosList = this.state.todos.length
       ? this.state.todos.map((todo) => (
-          <Todo todo={todo} checkComplete={this.checkComplete} key={todo.id} />
+          <Todo
+            todo={todo}
+            checkComplete={this.checkComplete}
+            startEdit={this.startEdit}
+            key={todo.id}
+          />
         ))
       : 'No todos...';
 
     return (
       <Fragment>
-        <AddTodo addTodo={this.addTodo} />
-        <ul>{todosList}</ul>
+        <AddTodo
+          editState={this.state.editState}
+          formText={this.state.formText}
+          handleFormChange={this.handleFormChange}
+          handleFormSubmit={this.handleFormSubmit}
+        />
+        <ul className='collection'>{todosList}</ul>
       </Fragment>
     );
   }
