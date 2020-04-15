@@ -13,6 +13,16 @@ class Todos extends Component {
     editState: null,
   };
 
+  saveLocalStorage = (todos) => {
+    localStorage.setItem('todos', JSON.stringify(todos));
+  };
+
+  componentDidMount() {
+    const ls = localStorage.getItem('todos');
+    const todos = ls ? JSON.parse(ls) : [];
+    this.setState({ todos });
+  }
+
   checkComplete = (id) => {
     const todos = [...this.state.todos];
     todos.map((todo) => {
@@ -20,6 +30,13 @@ class Todos extends Component {
       return todo;
     });
     this.setState({ todos });
+    this.saveLocalStorage(todos);
+  };
+
+  deleteTodo = (id) => {
+    const todos = this.state.todos.filter((todo) => todo.id !== id);
+    this.setState({ todos });
+    this.saveLocalStorage(todos);
   };
 
   startEdit = (id, text) => {
@@ -45,6 +62,7 @@ class Todos extends Component {
         },
       ];
       this.setState({ todos, formText: '' });
+      this.saveLocalStorage(todos);
     } else {
       const todos = this.state.todos.map((todo) => {
         if (this.state.editState.id === todo.id) {
@@ -52,7 +70,8 @@ class Todos extends Component {
         }
         return todo;
       });
-      this.setState({ todos, formText: '' });
+      this.setState({ todos, formText: '', editState: null });
+      this.saveLocalStorage(todos);
     }
   };
 
@@ -63,6 +82,7 @@ class Todos extends Component {
             todo={todo}
             checkComplete={this.checkComplete}
             startEdit={this.startEdit}
+            deleteTodo={this.deleteTodo}
             key={todo.id}
           />
         ))

@@ -1,12 +1,16 @@
 import React from 'react';
 
-const Todo = ({ todo, checkComplete, startEdit }) => {
+const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
   const handleChange = () => {
     checkComplete(todo.id);
   };
 
-  const handleClick = () => {
+  const handleEditClick = () => {
     startEdit(todo.id, todo.text);
+  };
+
+  const handleDeleteClick = () => {
+    deleteTodo(todo.id);
   };
 
   return (
@@ -19,7 +23,16 @@ const Todo = ({ todo, checkComplete, startEdit }) => {
         />
         <span>{todo.text}</span>
       </label>
-      <button className='btn btn-small secondary-content' onClick={handleClick}>
+      <button
+        className='btn btn-small secondary-content'
+        onClick={handleDeleteClick}
+      >
+        Delete
+      </button>
+      <button
+        className='btn btn-small secondary-content'
+        onClick={handleEditClick}
+      >
         Edit
       </button>
     </li>
