@@ -12,6 +12,12 @@ class Todos extends Component {
     ],
     formText: '',
     editState: null,
+    // Pagination
+    lastVisible: null,
+    currentTodos: [],
+    currentPage: 1,
+    pageLimit: 5,
+    totalPagesLoaded: 1,
   };
 
   saveLocalStorage = (todos) => {
@@ -22,10 +28,15 @@ class Todos extends Component {
     const res = await firestore
       .collection('todos')
       .orderBy('createdAt', 'desc')
+      .limit(this.state.pageLimit)
       .get();
     const todos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
 
-    this.setState({ todos });
+    this.setState({
+      todos,
+      currentTodos: todos,
+      lastVisible: res.docs[res.docs.length - 1],
+    });
   }
 
   checkComplete = (id) => {
@@ -73,6 +84,7 @@ class Todos extends Component {
         },
         ...this.state.todos,
       ];
+      todos.pop();
 
       firestore.collection('todos').add({
         text: this.state.formText,
@@ -99,9 +111,63 @@ class Todos extends Component {
     }
   };
 
+  handleNext = async () => {
+    const {
+      lastVisible,
+      currentTodos,
+      currentPage,
+      pageLimit,
+      totalPagesLoaded,
+    } = this.state;
+
+    if (currentTodos.length < 5) {
+      this.setState({ lastVisible: null });
+      return;
+    }
+    if (lastVisible && currentPage >= totalPagesLoaded) {
+      const res = await firestore
+        .collection('todos')
+        .orderBy('createdAt', 'desc')
+        .startAfter(lastVisible)
+        .limit(pageLimit)
+        .get();
+      const todos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+
+      this.setState({
+        todos: [...this.state.todos, ...todos],
+        currentTodos: todos,
+        lastVisible: res.docs[res.docs.length - 1],
+        currentPage: currentPage + 1,
+        totalPagesLoaded: totalPagesLoaded + 1,
+      });
+    } else {
+      const todos = [...this.state.todos].splice(currentPage * 5).splice(0, 5);
+
+      this.setState({
+        currentTodos: todos,
+        currentPage: currentPage + 1,
+      });
+    }
+  };
+
+  handlePrev = async () => {
+    const { currentPage, pageLimit } = this.state;
+
+    if (currentPage === 1) return;
+
+    const todos = [...this.state.todos]
+      .splice(currentPage * 5 - pageLimit * 2)
+      .splice(0, 5);
+
+    this.setState({
+      currentTodos: todos,
+      currentPage: currentPage - 1,
+    });
+  };
+
   render() {
-    const todosList = this.state.todos.length
-      ? this.state.todos.map((todo) => (
+    const todosList = this.state.currentTodos.length
+      ? this.state.currentTodos.map((todo) => (
           <Todo
             todo={todo}
             checkComplete={this.checkComplete}
@@ -121,6 +187,12 @@ class Todos extends Component {
           handleFormSubmit={this.handleFormSubmit}
         />
         <ul className='collection'>{todosList}</ul>
+        <button className='btn' onClick={this.handlePrev}>
+          Previous
+        </button>
+        <button className='btn' onClick={this.handleNext}>
+          Next
+        </button>
       </Fragment>
     );
   }
