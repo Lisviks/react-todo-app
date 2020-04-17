@@ -35,6 +35,9 @@ const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
       >
         Edit
       </button>
+      <button className='btn btn-small yellow darken-4 secondary-content'>
+        Add Sub-todo
+      </button>
     </li>
   );
 };

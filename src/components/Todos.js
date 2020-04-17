@@ -54,10 +54,42 @@ class Todos extends Component {
     this.setState({ todos });
   };
 
-  deleteTodo = (id) => {
+  deleteTodo = async (id) => {
+    const {
+      currentPage,
+      pageLimit,
+      lastVisible,
+      totalPagesLoaded,
+    } = this.state;
+
     const todos = this.state.todos.filter((todo) => todo.id !== id);
     this.setState({ todos });
-    firestore.collection('todos').doc(id).delete();
+    await firestore.collection('todos').doc(id).delete();
+
+    if (
+      currentPage === totalPagesLoaded ||
+      this.state.todos.length === pageLimit
+    ) {
+      const res = await firestore
+        .collection('todos')
+        .orderBy('createdAt', 'desc')
+        .startAfter(lastVisible)
+        .limit(pageLimit)
+        .get();
+      const todos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+
+      this.setState({
+        todos: [...this.state.todos, ...todos],
+        lastVisible: res.docs[res.docs.length - 1],
+        totalPagesLoaded: totalPagesLoaded + 1,
+      });
+    }
+
+    const currentTodos = [...this.state.todos]
+      .splice(currentPage * pageLimit - pageLimit)
+      .splice(0, pageLimit);
+
+    this.setState({ currentTodos });
   };
 
   startEdit = (id, text) => {
