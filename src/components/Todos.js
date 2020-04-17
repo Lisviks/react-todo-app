@@ -103,28 +103,37 @@ class Todos extends Component {
     this.setState({ formText: e.target.value });
   };
 
-  handleFormSubmit = (e) => {
+  handleFormSubmit = async (e) => {
     e.preventDefault();
 
     // Add new todo
     if (!this.state.editState) {
-      const todos = [
-        {
-          id: Math.floor(Math.random() * 1000000),
-          text: this.state.formText,
-          complete: false,
-        },
-        ...this.state.todos,
-      ];
-      todos.pop();
-
-      firestore.collection('todos').add({
+      const res = await firestore.collection('todos').add({
         text: this.state.formText,
         complete: false,
         createdAt: Date.now(),
       });
 
-      this.setState({ todos, formText: '' });
+      const todos = [
+        {
+          id: res.id,
+          text: this.state.formText,
+          complete: false,
+        },
+        ...this.state.todos,
+      ];
+
+      const currentTodos = [
+        {
+          id: res.id,
+          text: this.state.formText,
+          complete: false,
+        },
+        ...this.state.currentTodos,
+      ];
+      if (currentTodos.length > this.state.pageLimit) currentTodos.pop();
+
+      this.setState({ todos, currentTodos, formText: '' });
 
       // Edit todo
     } else {
