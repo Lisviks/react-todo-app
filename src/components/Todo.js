@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
+const Todo = ({ todo, checkComplete, startEdit, deleteTodo, getTodoId }) => {
   const handleChange = () => {
     checkComplete(todo.id);
   };
@@ -11,6 +11,10 @@ const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
 
   const handleDeleteClick = () => {
     deleteTodo(todo.id);
+  };
+
+  const handleSubTodo = () => {
+    getTodoId(todo.id);
   };
 
   return (
@@ -35,7 +39,11 @@ const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
       >
         Edit
       </button>
-      <button className='btn btn-small yellow darken-4 secondary-content'>
+      <button
+        className='btn btn-small yellow darken-4 secondary-content modal-trigger'
+        data-target='sub-todo-modal'
+        onClick={handleSubTodo}
+      >
         Add Sub-todo
       </button>
     </li>
