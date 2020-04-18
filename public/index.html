@@ -51,11 +51,14 @@
     -->
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        var elems = document.querySelectorAll('.modal');
-        var instances = M.Modal.init(elems);
-      });
-    </script>
   </body>
+  <script>
+    M.AutoInit();
+    document.addEventListener('DOMContentLoaded', function () {
+      const modal = document.querySelectorAll('.modal');
+      const modalInstance = M.Modal.init(modal);
+      const collapse = document.querySelectorAll('.collapsible');
+      const collapseInstance = M.Modal.init(collapse);
+    });
+  </script>
 </html>

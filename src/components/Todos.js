@@ -33,7 +33,12 @@ class Todos extends Component {
       .orderBy('createdAt', 'desc')
       .limit(this.state.pageLimit)
       .get();
-    const todos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+
+    const todos = res.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+      subTodos: [],
+    }));
 
     this.setState({
       todos,
@@ -241,7 +246,27 @@ class Todos extends Component {
       return todo;
     });
 
-    console.log(todos);
+    this.setState({ todos, subTodoText: '' });
+  };
+
+  showSubTodos = async (id) => {
+    const res = await firestore
+      .collection('todos')
+      .doc(id)
+      .collection('subTodos')
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    const subTodos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+
+    const todos = [...this.state.todos].map((todo) => {
+      if (todo.id === id) {
+        todo.subTodos = [...subTodos];
+      }
+      return todo;
+    });
+
+    this.setState({ todos });
   };
 
   render() {
@@ -253,6 +278,7 @@ class Todos extends Component {
             startEdit={this.startEdit}
             deleteTodo={this.deleteTodo}
             getTodoId={this.getTodoId}
+            showSubTodos={this.showSubTodos}
             key={todo.id}
           />
         ))
@@ -266,7 +292,7 @@ class Todos extends Component {
           handleFormChange={this.handleFormChange}
           handleFormSubmit={this.handleFormSubmit}
         />
-        <ul className='collection'>{todosList}</ul>
+        <ul className='collapsible'>{todosList}</ul>
         <button className='btn' onClick={this.handlePrev}>
           Previous
         </button>
