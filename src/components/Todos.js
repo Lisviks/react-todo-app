@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import Todo from './Todo';
 import AddTodo from './AddTodo';
 import { firestore } from '../config/firebase';
+import M from 'materialize-css';
 
 class Todos extends Component {
   state = {
@@ -267,8 +268,10 @@ class Todos extends Component {
 
     this.setState({ todos, subTodoText: '', currentTodoId: null });
 
-    document.querySelector('.modal').style.display = 'none';
-    document.querySelector('.modal-overlay').style.display = 'none';
+    // Close modal on submit
+    const elems = document.querySelectorAll('.modal');
+    const instances = M.Modal.init(elems)[0];
+    instances.close();
   };
 
   showSubTodos = async (id) => {
