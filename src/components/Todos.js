@@ -52,7 +52,6 @@ class Todos extends Component {
     });
 
     const { currentPage, pageLimit } = this.state;
-
     const currentTodos = [...this.state.todos]
       .splice(currentPage * 5 - pageLimit)
       .splice(0, 5);
@@ -147,7 +146,12 @@ class Todos extends Component {
         return todo;
       });
 
-      this.setState({ todos, formText: '', formState: null });
+      const { currentPage, pageLimit } = this.state;
+      const currentTodos = [...this.state.todos]
+        .splice(currentPage * 5 - pageLimit)
+        .splice(0, 5);
+
+      this.setState({ todos, currentTodos, formText: '', formState: null });
     }
   };
 
