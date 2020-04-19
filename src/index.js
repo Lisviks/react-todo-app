@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import M from 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
 
 ReactDOM.render(
@@ -11,4 +10,3 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
-M.AutoInit();

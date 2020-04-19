@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import Todo from './Todo';
 import AddTodo from './AddTodo';
 import { firestore } from '../config/firebase';
-import M from 'materialize-css';
 
 class Todos extends Component {
   state = {
@@ -19,9 +18,6 @@ class Todos extends Component {
     currentPage: 1,
     pageLimit: 5,
     totalPagesLoaded: 1,
-    // Sub todo
-    currentTodoId: null,
-    subTodoText: '',
   };
 
   saveLocalStorage = (todos) => {
@@ -38,7 +34,6 @@ class Todos extends Component {
     const todos = res.docs.map((doc) => ({
       ...doc.data(),
       id: doc.id,
-      subTodos: [],
     }));
 
     this.setState({
@@ -70,20 +65,6 @@ class Todos extends Component {
       lastVisible,
       totalPagesLoaded,
     } = this.state;
-
-    // First delete sub-todos from firestore
-    this.state.todos.forEach((todo) => {
-      if (todo.id === id) {
-        todo.subTodos.forEach((subTodo) =>
-          firestore
-            .collection('todos')
-            .doc(id)
-            .collection('subTodos')
-            .doc(subTodo.id)
-            .delete()
-        );
-      }
-    });
 
     const todos = this.state.todos.filter((todo) => todo.id !== id);
     this.setState({ todos });
@@ -142,7 +123,6 @@ class Todos extends Component {
           id: res.id,
           text: this.state.formText,
           complete: false,
-          subTodos: [],
         },
         ...this.state.todos,
       ];
@@ -152,7 +132,6 @@ class Todos extends Component {
           id: res.id,
           text: this.state.formText,
           complete: false,
-          subTodos: [],
         },
         ...this.state.currentTodos,
       ];
@@ -200,7 +179,6 @@ class Todos extends Component {
       const todos = res.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
-        subTodos: [],
       }));
 
       this.setState({
@@ -235,79 +213,20 @@ class Todos extends Component {
     });
   };
 
-  getTodoId = (id) => {
-    this.setState({ currentTodoId: id });
-  };
-
-  handleSubTodoSubmit = async (e) => {
-    e.preventDefault();
-
-    const res = await firestore
-      .collection('todos')
-      .doc(this.state.currentTodoId)
-      .collection('subTodos')
-      .add({
-        text: this.state.subTodoText,
-        complete: false,
-        createdAt: Date.now(),
-      });
-
-    const todos = [...this.state.todos].map((todo) => {
-      if (todo.id === this.state.currentTodoId) {
-        todo.subTodos = [
-          {
-            id: res.id,
-            text: this.state.subTodoText,
-            complete: false,
-          },
-          ...todo.subTodos,
-        ];
-      }
-      return todo;
-    });
-
-    this.setState({ todos, subTodoText: '', currentTodoId: null });
-
-    // Close modal on submit
-    const elems = document.querySelectorAll('.modal');
-    const instances = M.Modal.init(elems)[0];
-    instances.close();
-  };
-
-  showSubTodos = async (id) => {
-    const res = await firestore
-      .collection('todos')
-      .doc(id)
-      .collection('subTodos')
-      .orderBy('createdAt', 'desc')
-      .get();
-
-    const subTodos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-
-    const todos = [...this.state.todos].map((todo) => {
-      if (todo.id === id) {
-        todo.subTodos = [...subTodos];
-      }
-      return todo;
-    });
-
-    this.setState({ todos });
-  };
-
   render() {
-    const todosList = this.state.currentTodos.length
-      ? this.state.currentTodos.map((todo) => (
-          <Todo
-            todo={todo}
-            checkComplete={this.checkComplete}
-            startEdit={this.startEdit}
-            deleteTodo={this.deleteTodo}
-            getTodoId={this.getTodoId}
-            showSubTodos={this.showSubTodos}
-            key={todo.id}
-          />
-        ))
-      : 'No todos...';
+    const todosList = this.state.currentTodos.length ? (
+      this.state.currentTodos.map((todo) => (
+        <Todo
+          todo={todo}
+          checkComplete={this.checkComplete}
+          startEdit={this.startEdit}
+          deleteTodo={this.deleteTodo}
+          key={todo.id}
+        />
+      ))
+    ) : (
+      <div className='collection-item'>No todos...</div>
+    );
 
     return (
       <Fragment>
@@ -317,31 +236,13 @@ class Todos extends Component {
           handleFormChange={this.handleFormChange}
           handleFormSubmit={this.handleFormSubmit}
         />
-        <ul className='collapsible'>{todosList}</ul>
+        <ul className='collection'>{todosList}</ul>
         <button className='btn' onClick={this.handlePrev}>
           Previous
         </button>
         <button className='btn' onClick={this.handleNext}>
           Next
         </button>
-        {/* <!-- Modal Structure --> */}
-        <div id='sub-todo-modal' className='modal'>
-          <div className='modal-content'>
-            <h4>Add sub-todo</h4>
-            <form onSubmit={this.handleSubTodoSubmit}>
-              <div className='input-field'>
-                <input
-                  type='text'
-                  id='subTodoText'
-                  onChange={this.handleFormChange}
-                  value={this.state.subTodoText}
-                />
-                <label htmlFor='subTodoText'></label>
-              </div>
-              <button className='btn'>Add</button>
-            </form>
-          </div>
-        </div>
       </Fragment>
     );
   }
