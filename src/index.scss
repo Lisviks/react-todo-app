@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+[data-theme='light'] {
+  background: #fff;
+  color: #000;
+}
+
+[data-theme='dark'] {
+  background: #000;
+  color: #fff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  font-size: 3rem;
+  margin: 1rem 0;
+}
+
+.btn {
+  border: none;
+  background: #02d3a6;
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+  transition: opacity 0.3s ease;
+  margin-right: 0.5rem;
+
+  &-round {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.blue {
+      background: #01c9b5;
+    }
+
+    &.red {
+      background: #df1414;
+    }
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.form {
+  margin: 1rem auto;
+
+  .text-input {
+    border: none;
+    border-bottom: 1px solid #999;
+    padding: 0.5rem 1rem;
+    font-size: 1.3rem;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+
+.list {
+  list-style: none;
+  border: 1px solid #aaa;
+  padding: 0 1rem;
+  margin: 1rem auto;
+
+  .list-item {
+    border-bottom: 1px solid #aaa;
+    padding: 0.2rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:last-child {
+      border: none;
+    }
+
+    .buttons {
+      display: flex;
+    }
+  }
+}
+
+// https://codepen.io/cabrera/pen/mKoBa
+.checkbox-field {
+  $green: #22b573;
+  $grey: #555;
+  $transitionSpeed: 200ms;
+
+  position: relative;
+
+  input[type='checkbox'] + label {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 2px solid $grey;
+    border-radius: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(0%, -50%);
+    transition: all ease-out $transitionSpeed;
+    text-indent: 60px;
+    white-space: nowrap;
+    color: $grey;
+    user-select: none;
+
+    &:after {
+      content: '';
+      position: absolute;
+      width: 0px;
+      height: 10px;
+      border-bottom: 3px solid $green;
+      border-left: 3px solid $green;
+      top: 25%;
+      left: 50%;
+      transform-origin: bottom left;
+      transform: rotate(-45deg);
+      opacity: 0;
+      transition: all ease-out $transitionSpeed;
+    }
+  }
+
+  input[type='checkbox']:checked + label {
+    border: 3px solid $green;
+
+    &:after {
+      opacity: 1;
+      width: 25px;
+    }
+  }
+
+  .chk {
+    display: none;
+  }
+}
