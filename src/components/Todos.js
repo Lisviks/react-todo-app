@@ -5,11 +5,7 @@ import { firestore } from '../config/firebase';
 
 class Todos extends Component {
   state = {
-    todos: [
-      { id: 1, text: 'Buy some milk', complete: false },
-      { id: 2, text: 'Mow grass', complete: true },
-      { id: 3, text: 'Read a book', complete: false },
-    ],
+    todos: [],
     formText: '',
     formState: null,
     // Pagination
@@ -44,8 +40,7 @@ class Todos extends Component {
   }
 
   checkComplete = (id) => {
-    const todos = [...this.state.todos];
-    todos.map((todo) => {
+    const todos = [...this.state.todos].map((todo) => {
       if (todo.id === id) {
         todo.complete = !todo.complete;
         firestore
@@ -55,7 +50,13 @@ class Todos extends Component {
       }
       return todo;
     });
-    this.setState({ todos });
+
+    const { currentPage, pageLimit } = this.state;
+    const currentTodos = [...this.state.todos]
+      .splice(currentPage * 5 - pageLimit)
+      .splice(0, 5);
+
+    this.setState({ todos, currentTodos });
   };
 
   deleteTodo = async (id) => {
@@ -118,23 +119,15 @@ class Todos extends Component {
         createdAt: Date.now(),
       });
 
-      const todos = [
-        {
-          id: res.id,
-          text: this.state.formText,
-          complete: false,
-        },
-        ...this.state.todos,
-      ];
+      const newTodo = {
+        id: res.id,
+        text: this.state.formText,
+        complete: false,
+      };
 
-      const currentTodos = [
-        {
-          id: res.id,
-          text: this.state.formText,
-          complete: false,
-        },
-        ...this.state.currentTodos,
-      ];
+      const todos = [{ ...newTodo }, ...this.state.todos];
+
+      const currentTodos = [{ ...newTodo }, ...this.state.currentTodos];
       if (currentTodos.length > this.state.pageLimit) currentTodos.pop();
 
       this.setState({ todos, currentTodos, formText: '' });
@@ -152,7 +145,13 @@ class Todos extends Component {
         }
         return todo;
       });
-      this.setState({ todos, formText: '', formState: null });
+
+      const { currentPage, pageLimit } = this.state;
+      const currentTodos = [...this.state.todos]
+        .splice(currentPage * 5 - pageLimit)
+        .splice(0, 5);
+
+      this.setState({ todos, currentTodos, formText: '', formState: null });
     }
   };
 
