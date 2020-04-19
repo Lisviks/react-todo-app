@@ -4,17 +4,15 @@ const AddTodo = (props) => {
   const { handleFormSubmit, handleFormChange, formText, formState } = props;
 
   return (
-    <form onSubmit={handleFormSubmit}>
-      <div className='input-field'>
-        <input
-          type='text'
-          className='grey lighten-5'
-          id='formText'
-          value={formText}
-          onChange={handleFormChange}
-        />
-        <label htmlFor='text'>Add todo...</label>
-      </div>
+    <form className='form' onSubmit={handleFormSubmit}>
+      <input
+        type='text'
+        className='text-input'
+        id='formText'
+        value={formText}
+        onChange={handleFormChange}
+        placeholder='Todo...'
+      />
       <button className='btn'>{formState ? 'Edit' : 'Add'}</button>
     </form>
   );

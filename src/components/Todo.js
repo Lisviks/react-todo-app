@@ -14,34 +14,32 @@ const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
   };
 
   return (
-    <li className='collection-item'>
-      <div
-        className='valign-wrapper'
-        style={{ justifyContent: 'space-between' }}
-      >
-        <label>
-          <input
-            type='checkbox'
-            checked={todo.complete}
-            onChange={handleChange}
-          />
-          <span>{todo.text}</span>
-        </label>
-        <div className='buttons right'>
-          <button className='btn-floating btn-small' onClick={handleEditClick}>
-            <i className='material-icons' style={{ margin: 0 }}>
-              edit
-            </i>
-          </button>
-          <button
-            className='btn-floating btn-small red darken-1'
-            onClick={handleDeleteClick}
-          >
-            <i className='material-icons' style={{ margin: 0 }}>
-              delete_forever
-            </i>
-          </button>
-        </div>
+    <li className='list-item'>
+      <div className='checkbox-field'>
+        <input
+          type='checkbox'
+          className='chk'
+          id={todo.id}
+          checked={todo.complete}
+          onChange={handleChange}
+        />
+        <label htmlFor={todo.id}>{todo.text}</label>
+      </div>
+      {/* <label>
+        <input
+          type='checkbox'
+          checked={todo.complete}
+          onChange={handleChange}
+        />
+        <span>{todo.text}</span>
+      </label> */}
+      <div className='buttons'>
+        <button className='btn btn-round blue' onClick={handleEditClick}>
+          <i className='material-icons'>edit</i>
+        </button>
+        <button className='btn btn-round red' onClick={handleDeleteClick}>
+          <i className='material-icons'>delete_forever</i>
+        </button>
       </div>
     </li>
   );

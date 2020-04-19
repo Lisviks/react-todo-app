@@ -225,7 +225,7 @@ class Todos extends Component {
         />
       ))
     ) : (
-      <div className='collection-item'>No todos...</div>
+      <div className='list-item'>No todos...</div>
     );
 
     return (
@@ -236,7 +236,7 @@ class Todos extends Component {
           handleFormChange={this.handleFormChange}
           handleFormSubmit={this.handleFormSubmit}
         />
-        <ul className='collection'>{todosList}</ul>
+        <ul className='list'>{todosList}</ul>
         <button className='btn' onClick={this.handlePrev}>
           Previous
         </button>
