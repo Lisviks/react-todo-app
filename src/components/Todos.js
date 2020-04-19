@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import Todo from './Todo';
 import AddTodo from './AddTodo';
 import { firestore } from '../config/firebase';
+import PageLimit from './PageLimit';
 
 class Todos extends Component {
   state = {
@@ -53,8 +54,8 @@ class Todos extends Component {
 
     const { currentPage, pageLimit } = this.state;
     const currentTodos = [...this.state.todos]
-      .splice(currentPage * 5 - pageLimit)
-      .splice(0, 5);
+      .splice(currentPage * pageLimit - pageLimit)
+      .splice(0, pageLimit);
 
     this.setState({ todos, currentTodos });
   };
@@ -148,8 +149,8 @@ class Todos extends Component {
 
       const { currentPage, pageLimit } = this.state;
       const currentTodos = [...this.state.todos]
-        .splice(currentPage * 5 - pageLimit)
-        .splice(0, 5);
+        .splice(currentPage * pageLimit - pageLimit)
+        .splice(0, pageLimit);
 
       this.setState({ todos, currentTodos, formText: '', formState: null });
     }
@@ -164,7 +165,7 @@ class Todos extends Component {
       totalPagesLoaded,
     } = this.state;
 
-    if (currentTodos.length < 5) {
+    if (currentTodos.length < pageLimit) {
       this.setState({ lastVisible: null });
       return;
     }
@@ -188,7 +189,9 @@ class Todos extends Component {
         totalPagesLoaded: totalPagesLoaded + 1,
       });
     } else {
-      const todos = [...this.state.todos].splice(currentPage * 5).splice(0, 5);
+      const todos = [...this.state.todos]
+        .splice(currentPage * pageLimit)
+        .splice(0, pageLimit);
 
       this.setState({
         currentTodos: todos,
@@ -203,12 +206,32 @@ class Todos extends Component {
     if (currentPage === 1) return;
 
     const todos = [...this.state.todos]
-      .splice(currentPage * 5 - pageLimit * 2)
-      .splice(0, 5);
+      .splice(currentPage * pageLimit - pageLimit * 2)
+      .splice(0, pageLimit);
 
     this.setState({
       currentTodos: todos,
       currentPage: currentPage - 1,
+    });
+  };
+
+  setPageLimit = async (newPageLimit) => {
+    const res = await firestore
+      .collection('todos')
+      .orderBy('createdAt', 'desc')
+      .limit(newPageLimit)
+      .get();
+
+    const todos = res.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    this.setState({
+      todos,
+      currentTodos: todos,
+      lastVisible: res.docs[res.docs.length - 1],
+      pageLimit: newPageLimit,
     });
   };
 
@@ -242,6 +265,7 @@ class Todos extends Component {
         <button className='btn' onClick={this.handleNext}>
           Next
         </button>
+        <PageLimit setPageLimit={this.setPageLimit} />
       </Fragment>
     );
   }

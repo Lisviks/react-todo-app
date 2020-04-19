@@ -1,14 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 
-[data-theme='light'] {
-  background: #fff;
-  color: #000;
-}
-
-[data-theme='dark'] {
-  background: #000;
-  color: #fff;
-}
+$primary-color: #2980b9;
+$secondary-color: #1abc9c;
+$edit-btn-color: #34acdb;
+$delete-btn-color: #e73c3c;
+$checkbox-color: #2ecc71;
 
 * {
   box-sizing: border-box;
@@ -33,11 +29,12 @@ h1 {
 
 .btn {
   border: none;
-  background: #02d3a6;
+  background: $secondary-color;
   padding: 0.5rem 1rem;
   text-transform: uppercase;
-  transition: opacity 0.3s ease;
+  transition: filter 0.3s ease;
   margin-right: 0.5rem;
+  outline: none;
 
   &-round {
     height: 2.5rem;
@@ -48,16 +45,16 @@ h1 {
     align-items: center;
 
     &.blue {
-      background: #01c9b5;
+      background: $edit-btn-color;
     }
 
     &.red {
-      background: #df1414;
+      background: $delete-btn-color;
     }
   }
 
   &:hover {
-    opacity: 0.8;
+    filter: brightness(85%);
   }
 }
 
@@ -71,6 +68,7 @@ h1 {
     font-size: 1.3rem;
     width: 100%;
     margin-bottom: 1rem;
+    outline-color: $checkbox-color;
   }
 }
 
@@ -99,7 +97,6 @@ h1 {
 
 // https://codepen.io/cabrera/pen/mKoBa
 .checkbox-field {
-  $green: #22b573;
   $grey: #555;
   $transitionSpeed: 200ms;
 
@@ -125,8 +122,8 @@ h1 {
       position: absolute;
       width: 0px;
       height: 10px;
-      border-bottom: 3px solid $green;
-      border-left: 3px solid $green;
+      border-bottom: 3px solid $checkbox-color;
+      border-left: 3px solid $checkbox-color;
       top: 25%;
       left: 50%;
       transform-origin: bottom left;
@@ -137,7 +134,7 @@ h1 {
   }
 
   input[type='checkbox']:checked + label {
-    border: 3px solid $green;
+    border: 3px solid $checkbox-color;
 
     &:after {
       opacity: 1;
@@ -147,5 +144,20 @@ h1 {
 
   .chk {
     display: none;
+  }
+}
+
+.change-page-limit {
+  margin-top: 1rem;
+
+  span {
+    font-size: 0.9rem;
+  }
+  .page-limit {
+    margin-right: 1rem;
+    width: 6rem;
+    padding: 0.3rem 0.6rem;
+    text-align: center;
+    border: 1px solid #ddd;
   }
 }
