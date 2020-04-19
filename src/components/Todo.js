@@ -25,14 +25,6 @@ const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
         />
         <label htmlFor={todo.id}>{todo.text}</label>
       </div>
-      {/* <label>
-        <input
-          type='checkbox'
-          checked={todo.complete}
-          onChange={handleChange}
-        />
-        <span>{todo.text}</span>
-      </label> */}
       <div className='buttons'>
         <button className='btn btn-round blue' onClick={handleEditClick}>
           <i className='material-icons'>edit</i>
