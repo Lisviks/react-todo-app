@@ -70,6 +70,20 @@ class Todos extends Component {
       totalPagesLoaded,
     } = this.state;
 
+    // First delete sub-todos from firestore
+    this.state.todos.forEach((todo) => {
+      if (todo.id === id) {
+        todo.subTodos.forEach((subTodo) =>
+          firestore
+            .collection('todos')
+            .doc(id)
+            .collection('subTodos')
+            .doc(subTodo.id)
+            .delete()
+        );
+      }
+    });
+
     const todos = this.state.todos.filter((todo) => todo.id !== id);
     this.setState({ todos });
     await firestore.collection('todos').doc(id).delete();
@@ -137,6 +151,7 @@ class Todos extends Component {
           id: res.id,
           text: this.state.formText,
           complete: false,
+          subTodos: [],
         },
         ...this.state.currentTodos,
       ];
@@ -181,7 +196,11 @@ class Todos extends Component {
         .startAfter(lastVisible)
         .limit(pageLimit)
         .get();
-      const todos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+      const todos = res.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+        subTodos: [],
+      }));
 
       this.setState({
         todos: [...this.state.todos, ...todos],
@@ -246,7 +265,10 @@ class Todos extends Component {
       return todo;
     });
 
-    this.setState({ todos, subTodoText: '' });
+    this.setState({ todos, subTodoText: '', currentTodoId: null });
+
+    document.querySelector('.modal').style.display = 'none';
+    document.querySelector('.modal-overlay').style.display = 'none';
   };
 
   showSubTodos = async (id) => {
