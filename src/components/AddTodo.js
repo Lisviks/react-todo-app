@@ -1,7 +1,7 @@
 import React from 'react';
 
 const AddTodo = (props) => {
-  const { handleFormSubmit, handleFormChange, formText, editState } = props;
+  const { handleFormSubmit, handleFormChange, formText, formState } = props;
 
   return (
     <form onSubmit={handleFormSubmit}>
@@ -9,13 +9,13 @@ const AddTodo = (props) => {
         <input
           type='text'
           className='grey lighten-5'
-          id='text'
+          id='formText'
           value={formText}
           onChange={handleFormChange}
         />
         <label htmlFor='text'>Add todo...</label>
       </div>
-      <button className='btn'>{editState ? 'Edit' : 'Add'}</button>
+      <button className='btn'>{formState ? 'Edit' : 'Add'}</button>
     </form>
   );
 };

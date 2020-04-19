@@ -1,6 +1,13 @@
 import React from 'react';
 
-const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
+const Todo = ({
+  todo,
+  checkComplete,
+  startEdit,
+  deleteTodo,
+  getTodoId,
+  showSubTodos,
+}) => {
   const handleChange = () => {
     checkComplete(todo.id);
   };
@@ -13,31 +20,65 @@ const Todo = ({ todo, checkComplete, startEdit, deleteTodo }) => {
     deleteTodo(todo.id);
   };
 
+  const handleSubTodo = () => {
+    getTodoId(todo.id);
+  };
+
+  const handleExpand = () => {
+    showSubTodos(todo.id);
+  };
+
   return (
-    <li className='collection-item'>
-      <label>
-        <input
-          type='checkbox'
-          checked={todo.complete}
-          onChange={handleChange}
-        />
-        <span>{todo.text}</span>
-      </label>
-      <button
-        className='btn btn-small secondary-content red darken-1'
-        onClick={handleDeleteClick}
+    <li>
+      <div
+        className='collapsible-header valign-wrapper'
+        style={{ justifyContent: 'space-between' }}
       >
-        Delete
-      </button>
-      <button
-        className='btn btn-small secondary-content'
-        onClick={handleEditClick}
-      >
-        Edit
-      </button>
-      <button className='btn btn-small yellow darken-4 secondary-content'>
-        Add Sub-todo
-      </button>
+        <label>
+          <input
+            type='checkbox'
+            checked={todo.complete}
+            onChange={handleChange}
+          />
+          <span>{todo.text}</span>
+        </label>
+        <div className='buttons right'>
+          <button
+            className='btn btn-small grey lighten-2'
+            onClick={handleExpand}
+          >
+            Expand
+          </button>
+          <button
+            className='btn btn-small yellow darken-4 modal-trigger'
+            data-target='sub-todo-modal'
+            onClick={handleSubTodo}
+          >
+            Add Sub-todo
+          </button>
+          <button className='btn btn-small' onClick={handleEditClick}>
+            Edit
+          </button>
+          <button
+            className='btn btn-small red darken-1'
+            onClick={handleDeleteClick}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <div className='collapsible-body'>
+        {todo.subTodos.length ? (
+          <ul className='collection'>
+            {todo.subTodos.map((todo) => (
+              <li className='collection-item' key={todo.id}>
+                <span className=''>{todo.text}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
     </li>
   );
 };
