@@ -128,8 +128,13 @@ class Todos extends Component {
 
       const todos = [{ ...newTodo }, ...this.state.todos];
 
-      const currentTodos = [{ ...newTodo }, ...this.state.currentTodos];
-      if (currentTodos.length > this.state.pageLimit) currentTodos.pop();
+      const { currentPage, pageLimit } = this.state;
+      const currentTodos = [...todos]
+        .splice(currentPage * pageLimit - pageLimit)
+        .splice(0, pageLimit);
+
+      // const currentTodos = [{ ...newTodo }, ...this.state.currentTodos];
+      // if (currentTodos.length > this.state.pageLimit) currentTodos.pop();
 
       this.setState({ todos, currentTodos, formText: '' });
 
@@ -232,6 +237,8 @@ class Todos extends Component {
       currentTodos: todos,
       lastVisible: res.docs[res.docs.length - 1],
       pageLimit: newPageLimit,
+      currentPage: 1,
+      totalPagesLoaded: 1,
     });
   };
 
