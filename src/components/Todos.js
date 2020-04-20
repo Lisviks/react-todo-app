@@ -3,6 +3,7 @@ import Todo from './Todo';
 import AddTodo from './AddTodo';
 import { firestore } from '../config/firebase';
 import PageLimit from './PageLimit';
+import Filter from './Filter';
 
 class Todos extends Component {
   state = {
@@ -15,6 +16,8 @@ class Todos extends Component {
     currentPage: 1,
     pageLimit: 5,
     totalPagesLoaded: 1,
+    // Filter
+    filter: 'all',
   };
 
   fetchTodos = async (pageLimit) => {
@@ -233,6 +236,36 @@ class Todos extends Component {
     });
   };
 
+  filterTodos = (filter, todos) => {
+    const filterTodos = [...todos].filter((todo) => {
+      if (filter === 'active') return !todo.complete;
+      if (filter === 'complete') return todo.complete;
+      return todo;
+    });
+    return filterTodos;
+  };
+
+  showFilterTodos = async (filter) => {
+    let todos = this.filterTodos(filter, this.state.todos);
+
+    if (todos.length < this.state.pageLimit) {
+      const res = await firestore
+        .collection('todos')
+        .orderBy('createdAt', 'desc')
+        .startAfter(this.state.lastVisible)
+        .limit(this.state.pageLimit * 2)
+        .get();
+      const nextTodos = res.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      todos = this.filterTodos(filter, [...this.state.todos, ...nextTodos]);
+    }
+
+    this.updateCurrentPageTodos(todos);
+  };
+
   render() {
     const todosList = this.state.currentTodos.length ? (
       this.state.currentTodos.map((todo) => (
@@ -256,6 +289,7 @@ class Todos extends Component {
           handleFormChange={this.handleFormChange}
           handleFormSubmit={this.handleFormSubmit}
         />
+        <Filter showFilterTodos={this.showFilterTodos} />
         <ul className='list'>{todosList}</ul>
         <button className='btn' onClick={this.handlePrev}>
           Previous
