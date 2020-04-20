@@ -10,7 +10,16 @@ class PageLimit extends Component {
   };
 
   handleClick = () => {
-    this.props.setPageLimit(+this.state.pageLimit);
+    let pageLimit = 5;
+    if (this.state.pageLimit < 5) {
+      pageLimit = 5;
+    } else if (this.state.pageLimit > 20) {
+      pageLimit = 20;
+    } else {
+      pageLimit = this.state.pageLimit;
+    }
+
+    this.props.setPageLimit(+pageLimit);
   };
 
   render() {
