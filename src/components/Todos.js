@@ -17,15 +17,20 @@ class Todos extends Component {
     totalPagesLoaded: 1,
   };
 
-  saveLocalStorage = (todos) => {
-    localStorage.setItem('todos', JSON.stringify(todos));
+  updateCurrentTodos = (todos, pageLimit = this.state.pageLimit) => {
+    const { currentPage } = this.state;
+    console.log(this.state);
+    const currentTodos = [...todos]
+      .splice(currentPage * pageLimit - pageLimit)
+      .splice(0, pageLimit);
+
+    return currentTodos;
   };
 
   async componentDidMount() {
     const res = await firestore
       .collection('todos')
       .orderBy('createdAt', 'desc')
-      .limit(this.state.pageLimit)
       .get();
 
     const todos = res.docs.map((doc) => ({
@@ -33,9 +38,11 @@ class Todos extends Component {
       id: doc.id,
     }));
 
+    const currentTodos = this.updateCurrentTodos(todos);
+
     this.setState({
       todos,
-      currentTodos: todos,
+      currentTodos,
       lastVisible: res.docs[res.docs.length - 1],
     });
   }
@@ -52,48 +59,17 @@ class Todos extends Component {
       return todo;
     });
 
-    const { currentPage, pageLimit } = this.state;
-    const currentTodos = [...this.state.todos]
-      .splice(currentPage * pageLimit - pageLimit)
-      .splice(0, pageLimit);
+    const currentTodos = this.updateCurrentTodos(this.state.todos);
 
     this.setState({ todos, currentTodos });
   };
 
   deleteTodo = async (id) => {
-    const {
-      currentPage,
-      pageLimit,
-      lastVisible,
-      totalPagesLoaded,
-    } = this.state;
-
     const todos = this.state.todos.filter((todo) => todo.id !== id);
     this.setState({ todos });
     await firestore.collection('todos').doc(id).delete();
 
-    if (
-      currentPage === totalPagesLoaded ||
-      this.state.todos.length === pageLimit
-    ) {
-      const res = await firestore
-        .collection('todos')
-        .orderBy('createdAt', 'desc')
-        .startAfter(lastVisible)
-        .limit(pageLimit)
-        .get();
-      const todos = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-
-      this.setState({
-        todos: [...this.state.todos, ...todos],
-        lastVisible: res.docs[res.docs.length - 1],
-        totalPagesLoaded: totalPagesLoaded + 1,
-      });
-    }
-
-    const currentTodos = [...this.state.todos]
-      .splice(currentPage * pageLimit - pageLimit)
-      .splice(0, pageLimit);
+    const currentTodos = this.updateCurrentTodos(this.state.todos);
 
     this.setState({ currentTodos });
   };
@@ -128,13 +104,7 @@ class Todos extends Component {
 
       const todos = [{ ...newTodo }, ...this.state.todos];
 
-      const { currentPage, pageLimit } = this.state;
-      const currentTodos = [...todos]
-        .splice(currentPage * pageLimit - pageLimit)
-        .splice(0, pageLimit);
-
-      // const currentTodos = [{ ...newTodo }, ...this.state.currentTodos];
-      // if (currentTodos.length > this.state.pageLimit) currentTodos.pop();
+      const currentTodos = this.updateCurrentTodos(todos);
 
       this.setState({ todos, currentTodos, formText: '' });
 
@@ -152,57 +122,25 @@ class Todos extends Component {
         return todo;
       });
 
-      const { currentPage, pageLimit } = this.state;
-      const currentTodos = [...this.state.todos]
-        .splice(currentPage * pageLimit - pageLimit)
-        .splice(0, pageLimit);
+      const currentTodos = this.updateCurrentTodos(this.state.todos);
 
       this.setState({ todos, currentTodos, formText: '', formState: null });
     }
   };
 
   handleNext = async () => {
-    const {
-      lastVisible,
-      currentTodos,
-      currentPage,
-      pageLimit,
-      totalPagesLoaded,
-    } = this.state;
+    const { currentTodos, currentPage, pageLimit } = this.state;
 
-    if (currentTodos.length < pageLimit) {
-      this.setState({ lastVisible: null });
-      return;
-    }
-    if (lastVisible && currentPage >= totalPagesLoaded) {
-      const res = await firestore
-        .collection('todos')
-        .orderBy('createdAt', 'desc')
-        .startAfter(lastVisible)
-        .limit(pageLimit)
-        .get();
-      const todos = res.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
+    if (currentTodos.length < pageLimit) return;
 
-      this.setState({
-        todos: [...this.state.todos, ...todos],
-        currentTodos: todos,
-        lastVisible: res.docs[res.docs.length - 1],
-        currentPage: currentPage + 1,
-        totalPagesLoaded: totalPagesLoaded + 1,
-      });
-    } else {
-      const todos = [...this.state.todos]
-        .splice(currentPage * pageLimit)
-        .splice(0, pageLimit);
+    const todos = [...this.state.todos]
+      .splice(currentPage * pageLimit)
+      .splice(0, pageLimit);
 
-      this.setState({
-        currentTodos: todos,
-        currentPage: currentPage + 1,
-      });
-    }
+    this.setState({
+      currentTodos: todos,
+      currentPage: currentPage + 1,
+    });
   };
 
   handlePrev = async () => {
@@ -221,22 +159,28 @@ class Todos extends Component {
   };
 
   setPageLimit = async (newPageLimit) => {
-    const res = await firestore
-      .collection('todos')
-      .orderBy('createdAt', 'desc')
-      .limit(newPageLimit)
-      .get();
+    // const res = await firestore
+    //   .collection('todos')
+    //   .orderBy('createdAt', 'desc')
+    //   .limit(newPageLimit)
+    //   .get();
 
-    const todos = res.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
+    // const todos = res.docs.map((doc) => ({
+    //   ...doc.data(),
+    //   id: doc.id,
+    // }));
+
+    const currentTodos = this.updateCurrentTodos(
+      this.state.todos,
+      newPageLimit
+    );
 
     this.setState({
-      todos,
-      currentTodos: todos,
-      lastVisible: res.docs[res.docs.length - 1],
+      // todos,
+      // currentTodos: todos,
+      // lastVisible: res.docs[res.docs.length - 1],
       pageLimit: newPageLimit,
+      currentTodos,
       currentPage: 1,
       totalPagesLoaded: 1,
     });
