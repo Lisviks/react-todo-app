@@ -31,21 +31,6 @@ class Todos extends Component {
       .orderBy('createdAt', 'desc')
       .get();
 
-    return res;
-  };
-
-  updateCurrentPageTodos = (todos = this.state.todos) => {
-    const { currentPage, pageLimit } = this.state;
-    const currentTodos = [...todos]
-      .splice(currentPage * pageLimit - pageLimit)
-      .splice(0, pageLimit);
-
-    this.setState({ currentTodos });
-  };
-
-  async componentDidMount() {
-    const res = await this.fetchTodos(this.state.pageLimit);
-
     const todos = res.docs.map((doc) => ({
       ...doc.data(),
       id: doc.id,
@@ -53,11 +38,7 @@ class Todos extends Component {
 
     const currentTodos = this.updateCurrentTodos(todos);
 
-    this.setState({
-      todos,
-      currentTodos,
-      lastVisible: res.docs[res.docs.length - 1],
-    });
+    this.setState({ todos, currentTodos });
   }
 
   checkComplete = (id) => {
@@ -71,8 +52,6 @@ class Todos extends Component {
       }
       return todo;
     });
-
-    const currentTodos = this.updateCurrentTodos(this.state.todos);
 
     this.setState({ todos });
   };
@@ -119,7 +98,7 @@ class Todos extends Component {
 
       const currentTodos = this.updateCurrentTodos(todos);
 
-      this.setState({ todos, formText: '' });
+      this.setState({ todos, formText: '', currentTodos });
 
       // Edit todo
     } else {
@@ -134,8 +113,6 @@ class Todos extends Component {
         }
         return todo;
       });
-
-      const currentTodos = this.updateCurrentTodos(this.state.todos);
 
       this.setState({ todos, formText: '', formState: null });
     }
@@ -181,7 +158,6 @@ class Todos extends Component {
       pageLimit: newPageLimit,
       currentTodos,
       currentPage: 1,
-      totalPagesLoaded: 1,
     });
   };
 
