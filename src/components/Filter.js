@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Filter = ({ showFilterTodos }) => {
+const Filter = ({ filterTodos }) => {
   const changeFilter = (e) => {
     document
       .querySelectorAll('button')
@@ -8,15 +8,15 @@ const Filter = ({ showFilterTodos }) => {
 
     switch (e.target.textContent) {
       case 'Active':
-        showFilterTodos('active');
+        filterTodos('active');
         e.target.classList.toggle('active');
         break;
       case 'Complete':
-        showFilterTodos('complete');
+        filterTodos('complete');
         e.target.classList.toggle('active');
         break;
       default:
-        showFilterTodos('all');
+        filterTodos('all');
         e.target.classList.toggle('active');
         break;
     }
