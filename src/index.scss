@@ -161,3 +161,12 @@ h1 {
     border: 1px solid #ddd;
   }
 }
+
+.filter-list {
+  list-style: none;
+  display: flex;
+
+  .btn.active {
+    background: lighten($secondary-color, 10);
+  }
+}
