@@ -22,8 +22,8 @@ class Todos extends Component {
 
   updateCurrentTodos = (todos, pageLimit = this.state.pageLimit) => {
     const { currentPage } = this.state;
-    console.log(this.state);
-    const currentTodos = [...todos]
+    let currentTodos;
+    currentTodos = [...todos]
       .splice(currentPage * pageLimit - pageLimit)
       .splice(0, pageLimit);
 
@@ -58,7 +58,9 @@ class Todos extends Component {
       return todo;
     });
 
-    this.setState({ todos });
+    const currentTodos = this.updateCurrentTodos(this.filterTodos());
+
+    this.setState({ todos, currentTodos });
   };
 
   deleteTodo = async (id) => {
@@ -66,7 +68,7 @@ class Todos extends Component {
     this.setState({ todos });
     await firestore.collection('todos').doc(id).delete();
 
-    const currentTodos = this.updateCurrentTodos(this.state.todos);
+    const currentTodos = this.updateCurrentTodos(this.filterTodos());
 
     this.setState({ currentTodos });
   };
@@ -101,7 +103,7 @@ class Todos extends Component {
 
       const todos = [{ ...newTodo }, ...this.state.todos];
 
-      const currentTodos = this.updateCurrentTodos(todos);
+      const currentTodos = this.updateCurrentTodos(this.filterTodos());
 
       this.setState({ todos, formText: '', currentTodos });
 
@@ -128,7 +130,7 @@ class Todos extends Component {
 
     if (currentTodos.length < pageLimit) return;
 
-    const todos = [...this.state.todos]
+    const todos = [...this.filterTodos()]
       .splice(currentPage * pageLimit)
       .splice(0, pageLimit);
 
@@ -143,7 +145,7 @@ class Todos extends Component {
 
     if (currentPage === 1) return;
 
-    const todos = [...this.state.todos]
+    const todos = [...this.filterTodos()]
       .splice(currentPage * pageLimit - pageLimit * 2)
       .splice(0, pageLimit);
 
@@ -166,14 +168,20 @@ class Todos extends Component {
     });
   };
 
-  filterTodos = (filter) => {
+  filterTodos = (filter = this.state.filter) => {
     const filteredTodos = [...this.state.todos].filter((todo) => {
       if (filter === 'active') return !todo.complete;
       if (filter === 'complete') return todo.complete;
       return todo;
     });
 
-    this.setState({ filter, filteredTodos });
+    this.setState({ filter });
+    return filteredTodos;
+  };
+
+  handleFilterClick = (filter) => {
+    const currentTodos = this.updateCurrentTodos(this.filterTodos(filter));
+    this.setState({ currentTodos });
   };
 
   render() {
@@ -199,7 +207,7 @@ class Todos extends Component {
           handleFormChange={this.handleFormChange}
           handleFormSubmit={this.handleFormSubmit}
         />
-        <Filter filterTodos={this.filterTodos} />
+        <Filter handleFilterClick={this.handleFilterClick} />
         <ul className='list'>{todosList}</ul>
         <button className='btn' onClick={this.handlePrev}>
           Previous
