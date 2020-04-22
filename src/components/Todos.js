@@ -10,11 +10,9 @@ class Todos extends Component {
     formText: '',
     formState: null,
     // Pagination
-    lastVisible: null,
     currentTodos: [],
     currentPage: 1,
     pageLimit: 5,
-    totalPagesLoaded: 1,
   };
 
   updateCurrentTodos = (todos, pageLimit = this.state.pageLimit) => {
@@ -32,6 +30,21 @@ class Todos extends Component {
       .collection('todos')
       .orderBy('createdAt', 'desc')
       .get();
+
+    return res;
+  };
+
+  updateCurrentPageTodos = (todos = this.state.todos) => {
+    const { currentPage, pageLimit } = this.state;
+    const currentTodos = [...todos]
+      .splice(currentPage * pageLimit - pageLimit)
+      .splice(0, pageLimit);
+
+    this.setState({ currentTodos });
+  };
+
+  async componentDidMount() {
+    const res = await this.fetchTodos(this.state.pageLimit);
 
     const todos = res.docs.map((doc) => ({
       ...doc.data(),
@@ -61,7 +74,7 @@ class Todos extends Component {
 
     const currentTodos = this.updateCurrentTodos(this.state.todos);
 
-    this.setState({ todos, currentTodos });
+    this.setState({ todos });
   };
 
   deleteTodo = async (id) => {
@@ -106,7 +119,7 @@ class Todos extends Component {
 
       const currentTodos = this.updateCurrentTodos(todos);
 
-      this.setState({ todos, currentTodos, formText: '' });
+      this.setState({ todos, formText: '' });
 
       // Edit todo
     } else {
@@ -124,7 +137,7 @@ class Todos extends Component {
 
       const currentTodos = this.updateCurrentTodos(this.state.todos);
 
-      this.setState({ todos, currentTodos, formText: '', formState: null });
+      this.setState({ todos, formText: '', formState: null });
     }
   };
 
@@ -159,26 +172,12 @@ class Todos extends Component {
   };
 
   setPageLimit = async (newPageLimit) => {
-    // const res = await firestore
-    //   .collection('todos')
-    //   .orderBy('createdAt', 'desc')
-    //   .limit(newPageLimit)
-    //   .get();
-
-    // const todos = res.docs.map((doc) => ({
-    //   ...doc.data(),
-    //   id: doc.id,
-    // }));
-
     const currentTodos = this.updateCurrentTodos(
       this.state.todos,
       newPageLimit
     );
 
     this.setState({
-      // todos,
-      // currentTodos: todos,
-      // lastVisible: res.docs[res.docs.length - 1],
       pageLimit: newPageLimit,
       currentTodos,
       currentPage: 1,
