@@ -4,7 +4,11 @@ $primary-color: #2980b9;
 $secondary-color: #1abc9c;
 $edit-btn-color: #34acdb;
 $delete-btn-color: #e73c3c;
-$checkbox-color: #2ecc71;
+
+:root {
+  --light-grey: #fdfdfd;
+  --dark-grey: #333;
+}
 
 * {
   box-sizing: border-box;
@@ -14,11 +18,15 @@ $checkbox-color: #2ecc71;
 
 body {
   font-family: 'Montserrat', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: background 0.5s, color 0.5s;
 }
 
 .container {
   max-width: 1100px;
   margin: auto;
+  padding: 2rem;
 }
 
 h1 {
@@ -68,7 +76,7 @@ h1 {
     font-size: 1.3rem;
     width: 100%;
     margin-bottom: 1rem;
-    outline-color: $checkbox-color;
+    outline-color: $secondary-color;
   }
 }
 
@@ -97,7 +105,7 @@ h1 {
 
 // https://codepen.io/cabrera/pen/mKoBa
 .checkbox-field {
-  $grey: #555;
+  $checkbox-color: #2ecc71;
   $transitionSpeed: 200ms;
 
   position: relative;
@@ -106,7 +114,7 @@ h1 {
     position: absolute;
     width: 30px;
     height: 30px;
-    border: 2px solid $grey;
+    border: 2px solid var(--text-color);
     border-radius: 100%;
     top: 50%;
     left: 50%;
@@ -114,7 +122,7 @@ h1 {
     transition: all ease-out $transitionSpeed;
     text-indent: 60px;
     white-space: nowrap;
-    color: $grey;
+    color: var(--text-color);
     user-select: none;
 
     &:after {
@@ -169,4 +177,70 @@ h1 {
   .btn.active {
     background: lighten($secondary-color, 10);
   }
+}
+
+// Theme switch
+.theme-switch {
+  display: flex;
+  align-items: center;
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    margin: 0 0.5rem;
+    width: 50px;
+    height: 26px;
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ccc;
+      border-radius: 34px;
+      transition: 0.4s;
+    }
+
+    .slider::before {
+      position: absolute;
+      content: '';
+      height: 18px;
+      width: 18px;
+      left: 4px;
+      bottom: 4px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.4s;
+    }
+
+    input:checked + .slider {
+      background-color: $secondary-color;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px $secondary-color;
+    }
+
+    input:checked + .slider::before {
+      transform: translateX(23px);
+    }
+  }
+}
+
+.light {
+  --bg-color: var(--light-grey);
+  --text-color: var(--dark-grey);
+}
+
+.dark {
+  --bg-color: var(--dark-grey);
+  --text-color: var(--light-grey);
 }
