@@ -4,18 +4,20 @@ import ThemeSwitch from './components/ThemeSwitch';
 
 class App extends Component {
   state = {
-    darkTheme: true,
+    darkTheme: false,
   };
 
   componentDidMount() {
     const darkTheme = JSON.parse(localStorage.getItem('theme'));
-    this.setState({ darkTheme });
-
-    if (this.state.darkTheme) {
-      document.querySelector('body').classList = 'dark';
-    } else {
-      document.querySelector('body').classList = 'light';
-    }
+    this.setState({ darkTheme }, () => {
+      if (this.state.darkTheme) {
+        console.log(this.state);
+        document.querySelector('body').classList = 'dark';
+      } else {
+        console.log(this.state);
+        document.querySelector('body').classList = 'light';
+      }
+    });
   }
 
   switchTheme = () => {
