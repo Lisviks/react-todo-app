@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Todos from './components/Todos';
 import ThemeSwitch from './components/ThemeSwitch';
+import LoginForm from './components/LoginForm';
+import SignUpForm from './components/SignUpForm';
 
 class App extends Component {
   state = {

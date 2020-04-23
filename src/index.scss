@@ -43,6 +43,7 @@ h1 {
   transition: filter 0.3s ease;
   margin-right: 0.5rem;
   outline: none;
+  cursor: pointer;
 
   &-round {
     height: 2.5rem;
@@ -243,4 +244,58 @@ h1 {
 .dark {
   --bg-color: var(--dark-grey);
   --text-color: var(--light-grey);
+}
+
+// Login/Signup forms
+.login-form,
+.signup-form {
+  width: 360px;
+  padding: 40px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  // background: #ddd;
+  text-align: center;
+
+  h1 {
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  input {
+    background: none;
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    border: 2px solid $primary-color;
+    padding: 14px 10px;
+    width: 200px;
+    outline: none;
+    color: #fff;
+    border-radius: 24px;
+    transition: 0.25s;
+
+    &:focus {
+      width: 280px;
+      border-color: $secondary-color;
+    }
+  }
+
+  .btn {
+    background: none;
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    border: 2px solid $secondary-color;
+    padding: 14px 40px;
+    outline: none;
+    color: var(--text-color);
+    border-radius: 24px;
+    transition: 0.25s;
+
+    &:hover {
+      background: $secondary-color;
+    }
+  }
 }
