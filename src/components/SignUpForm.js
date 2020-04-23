@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SignUpForm = () => {
+const SignUpForm = ({ showLogin }) => {
   return (
     <form className='signup-form'>
       <h1>Sign up</h1>
@@ -8,6 +8,12 @@ const SignUpForm = () => {
       <input type='email' placeholder='Email' />
       <input type='password' placeholder='Password' />
       <button className='btn'>Sign up</button>
+      <span>
+        Already have an account?{' '}
+        <button className='a-tag-btn' onClick={showLogin}>
+          Login
+        </button>
+      </span>
     </form>
   );
 };

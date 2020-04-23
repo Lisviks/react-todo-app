@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import Todos from './components/Todos';
 import ThemeSwitch from './components/ThemeSwitch';
 import LoginForm from './components/LoginForm';
@@ -7,16 +7,16 @@ import SignUpForm from './components/SignUpForm';
 class App extends Component {
   state = {
     darkTheme: false,
+    isAuth: false,
+    loginForm: true,
   };
 
   componentDidMount() {
     const darkTheme = JSON.parse(localStorage.getItem('theme'));
     this.setState({ darkTheme }, () => {
       if (this.state.darkTheme) {
-        console.log(this.state);
         document.querySelector('body').classList = 'dark';
       } else {
-        console.log(this.state);
         document.querySelector('body').classList = 'light';
       }
     });
@@ -35,6 +35,18 @@ class App extends Component {
     return this.state.darkTheme;
   };
 
+  showSignUp = (e) => {
+    e.preventDefault();
+    console.log('showsginup');
+    this.setState({ loginForm: false });
+  };
+
+  showLogin = (e) => {
+    e.preventDefault();
+    console.log('showlogin');
+    this.setState({ loginForm: true });
+  };
+
   render() {
     return (
       <div className='container'>
@@ -42,8 +54,20 @@ class App extends Component {
           switchTheme={this.switchTheme}
           currentTheme={this.currentTheme}
         />
-        <h1>Todo App</h1>
-        <Todos />
+        {this.state.isAuth ? (
+          <Fragment>
+            <h1>Todo App</h1>
+            <Todos />
+          </Fragment>
+        ) : (
+          <Fragment>
+            {this.state.loginForm ? (
+              <LoginForm showSingUp={this.showSignUp} />
+            ) : (
+              <SignUpForm showLogin={this.showLogin} />
+            )}
+          </Fragment>
+        )}
       </div>
     );
   }
