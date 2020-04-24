@@ -32,6 +32,8 @@ class Todos extends Component {
 
   async componentDidMount() {
     const res = await firestore
+      .collection('users')
+      .doc(this.props.user.id)
       .collection('todos')
       .orderBy('createdAt', 'desc')
       .get();
@@ -51,6 +53,8 @@ class Todos extends Component {
       if (todo.id === id) {
         todo.complete = !todo.complete;
         firestore
+          .collection('users')
+          .doc(this.props.user.id)
           .collection('todos')
           .doc(id)
           .update({ complete: todo.complete });
@@ -66,7 +70,12 @@ class Todos extends Component {
   deleteTodo = async (id) => {
     const todos = this.state.todos.filter((todo) => todo.id !== id);
     this.setState({ todos });
-    await firestore.collection('todos').doc(id).delete();
+    await firestore
+      .collection('users')
+      .doc(this.props.user.id)
+      .collection('todos')
+      .doc(id)
+      .delete();
 
     const currentTodos = this.updateCurrentTodos(this.filterTodos());
 
@@ -89,11 +98,15 @@ class Todos extends Component {
 
     // Add new todo
     if (!this.state.formState) {
-      const res = await firestore.collection('todos').add({
-        text: this.state.formText,
-        complete: false,
-        createdAt: Date.now(),
-      });
+      const res = await firestore
+        .collection('users')
+        .doc(this.props.user.id)
+        .collection('todos')
+        .add({
+          text: this.state.formText,
+          complete: false,
+          createdAt: Date.now(),
+        });
 
       const newTodo = {
         id: res.id,
@@ -114,6 +127,8 @@ class Todos extends Component {
           todo.text = this.state.formText;
 
           firestore
+            .collection('users')
+            .doc(this.props.user.id)
             .collection('todos')
             .doc(todo.id)
             .update({ text: todo.text });
