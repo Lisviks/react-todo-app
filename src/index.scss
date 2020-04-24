@@ -298,4 +298,21 @@ h1 {
       background: $secondary-color;
     }
   }
+
+  span {
+    font-size: 0.9rem;
+
+    .change-form-btn {
+      border: none;
+      background: none;
+      color: var(--text-color);
+      font-size: 0.9rem;
+      transition: color 0.3s;
+
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+  }
 }

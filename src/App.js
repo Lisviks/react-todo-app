@@ -3,11 +3,12 @@ import Todos from './components/Todos';
 import ThemeSwitch from './components/ThemeSwitch';
 import LoginForm from './components/LoginForm';
 import SignUpForm from './components/SignUpForm';
+import { firestore, auth } from './config/firebase';
 
 class App extends Component {
   state = {
     darkTheme: false,
-    isAuth: false,
+    user: null,
     loginForm: true,
   };
 
@@ -21,6 +22,33 @@ class App extends Component {
       }
     });
   }
+
+  login = async (email, password) => {
+    const res = await auth.signInWithEmailAndPassword(email, password);
+
+    const user = await firestore.collection('users').doc(res.user.uid).get();
+    const userData = user.data();
+
+    this.setState({
+      user: {
+        id: res.user.uid,
+        username: userData.username,
+        email: userData.email,
+      },
+    });
+  };
+
+  signUp = async (username, email, password) => {
+    const res = await auth.createUserWithEmailAndPassword(email, password);
+
+    this.setState({ user: { id: res.user.uid, username, email } });
+
+    firestore.collection('users').doc(res.user.uid).set({
+      email,
+      username,
+      createdAt: Date.now(),
+    });
+  };
 
   switchTheme = () => {
     this.setState({ darkTheme: !this.state.darkTheme }, () =>
@@ -54,7 +82,7 @@ class App extends Component {
           switchTheme={this.switchTheme}
           currentTheme={this.currentTheme}
         />
-        {this.state.isAuth ? (
+        {this.state.user ? (
           <Fragment>
             <h1>Todo App</h1>
             <Todos />
@@ -62,9 +90,9 @@ class App extends Component {
         ) : (
           <Fragment>
             {this.state.loginForm ? (
-              <LoginForm showSingUp={this.showSignUp} />
+              <LoginForm showSingUp={this.showSignUp} login={this.login} />
             ) : (
-              <SignUpForm showLogin={this.showLogin} />
+              <SignUpForm showLogin={this.showLogin} signUp={this.signUp} />
             )}
           </Fragment>
         )}
