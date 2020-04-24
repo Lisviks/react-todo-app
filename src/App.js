@@ -1,24 +1,75 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import Todos from './components/Todos';
 import ThemeSwitch from './components/ThemeSwitch';
+import LoginForm from './components/LoginForm';
+import SignUpForm from './components/SignUpForm';
+import { firestore, auth } from './config/firebase';
 
 class App extends Component {
   state = {
     darkTheme: false,
+    user: null,
+    loginForm: true,
   };
 
   componentDidMount() {
     const darkTheme = JSON.parse(localStorage.getItem('theme'));
     this.setState({ darkTheme }, () => {
       if (this.state.darkTheme) {
-        console.log(this.state);
         document.querySelector('body').classList = 'dark';
       } else {
-        console.log(this.state);
         document.querySelector('body').classList = 'light';
       }
     });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const res = await firestore.collection('users').doc(user.uid).get();
+        const userData = res.data();
+        this.setState({
+          user: {
+            id: user.uid,
+            username: userData.username,
+            email: userData.email,
+          },
+        });
+      } else {
+        this.setState({ user: null });
+      }
+    });
   }
+
+  login = async (email, password) => {
+    const res = await auth.signInWithEmailAndPassword(email, password);
+
+    const user = await firestore.collection('users').doc(res.user.uid).get();
+    const userData = user.data();
+
+    this.setState({
+      user: {
+        id: res.user.uid,
+        username: userData.username,
+        email: userData.email,
+      },
+    });
+  };
+
+  signUp = async (username, email, password) => {
+    const res = await auth.createUserWithEmailAndPassword(email, password);
+
+    this.setState({ user: { id: res.user.uid, username, email } });
+
+    firestore.collection('users').doc(res.user.uid).set({
+      email,
+      username,
+      createdAt: Date.now(),
+    });
+  };
+
+  logout = () => {
+    auth.signOut();
+    this.setState({ user: null });
+  };
 
   switchTheme = () => {
     this.setState({ darkTheme: !this.state.darkTheme }, () =>
@@ -33,6 +84,18 @@ class App extends Component {
     return this.state.darkTheme;
   };
 
+  showSignUp = (e) => {
+    e.preventDefault();
+    console.log('showsginup');
+    this.setState({ loginForm: false });
+  };
+
+  showLogin = (e) => {
+    e.preventDefault();
+    console.log('showlogin');
+    this.setState({ loginForm: true });
+  };
+
   render() {
     return (
       <div className='container'>
@@ -40,8 +103,23 @@ class App extends Component {
           switchTheme={this.switchTheme}
           currentTheme={this.currentTheme}
         />
-        <h1>Todo App</h1>
-        <Todos />
+        {this.state.user ? (
+          <Fragment>
+            <button className='btn' onClick={this.logout}>
+              Logout
+            </button>
+            <h1>Todo App</h1>
+            <Todos />
+          </Fragment>
+        ) : (
+          <Fragment>
+            {this.state.loginForm ? (
+              <LoginForm showSingUp={this.showSignUp} login={this.login} />
+            ) : (
+              <SignUpForm showLogin={this.showLogin} signUp={this.signUp} />
+            )}
+          </Fragment>
+        )}
       </div>
     );
   }
