@@ -98,6 +98,8 @@ class Todos extends Component {
 
     // Add new todo
     if (!this.state.formState) {
+      if (!this.state.formText) return;
+
       const res = await firestore
         .collection('users')
         .doc(this.props.user.id)
@@ -122,6 +124,8 @@ class Todos extends Component {
 
       // Edit todo
     } else {
+      if (!this.state.formText) return;
+
       const todos = this.state.todos.map((todo) => {
         if (this.state.formState.id === todo.id) {
           todo.text = this.state.formText;
