@@ -40,30 +40,38 @@ class App extends Component {
   }
 
   login = async (email, password) => {
-    const res = await auth.signInWithEmailAndPassword(email, password);
+    try {
+      const res = await auth.signInWithEmailAndPassword(email, password);
 
-    const user = await firestore.collection('users').doc(res.user.uid).get();
-    const userData = user.data();
+      const user = await firestore.collection('users').doc(res.user.uid).get();
+      const userData = user.data();
 
-    this.setState({
-      user: {
-        id: res.user.uid,
-        username: userData.username,
-        email: userData.email,
-      },
-    });
+      this.setState({
+        user: {
+          id: res.user.uid,
+          username: userData.username,
+          email: userData.email,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   signUp = async (username, email, password) => {
-    const res = await auth.createUserWithEmailAndPassword(email, password);
+    try {
+      const res = await auth.createUserWithEmailAndPassword(email, password);
 
-    this.setState({ user: { id: res.user.uid, username, email } });
+      this.setState({ user: { id: res.user.uid, username, email } });
 
-    firestore.collection('users').doc(res.user.uid).set({
-      email,
-      username,
-      createdAt: Date.now(),
-    });
+      firestore.collection('users').doc(res.user.uid).set({
+        email,
+        username,
+        createdAt: Date.now(),
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   logout = () => {
@@ -99,17 +107,23 @@ class App extends Component {
   render() {
     return (
       <div className='container'>
-        <ThemeSwitch
-          switchTheme={this.switchTheme}
-          currentTheme={this.currentTheme}
-        />
-        {this.state.user ? (
-          <Fragment>
-            <button className='btn' onClick={this.logout}>
+        <div className='header'>
+          <ThemeSwitch
+            switchTheme={this.switchTheme}
+            currentTheme={this.currentTheme}
+          />
+          {this.state.user && (
+            <button className='btn logout-btn' onClick={this.logout}>
               Logout
             </button>
-            <h1>Todo App</h1>
-            <Todos />
+          )}
+        </div>
+        {this.state.user ? (
+          <Fragment>
+            <div className='todo-app'>
+              <h1>Todo App</h1>
+              <Todos user={this.state.user} />
+            </div>
           </Fragment>
         ) : (
           <Fragment>
