@@ -21,6 +21,22 @@ class App extends Component {
         document.querySelector('body').classList = 'light';
       }
     });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const res = await firestore.collection('users').doc(user.uid).get();
+        const userData = res.data();
+        this.setState({
+          user: {
+            id: user.uid,
+            username: userData.username,
+            email: userData.email,
+          },
+        });
+      } else {
+        this.setState({ user: null });
+      }
+    });
   }
 
   login = async (email, password) => {
@@ -48,6 +64,11 @@ class App extends Component {
       username,
       createdAt: Date.now(),
     });
+  };
+
+  logout = () => {
+    auth.signOut();
+    this.setState({ user: null });
   };
 
   switchTheme = () => {
@@ -84,6 +105,9 @@ class App extends Component {
         />
         {this.state.user ? (
           <Fragment>
+            <button className='btn' onClick={this.logout}>
+              Logout
+            </button>
             <h1>Todo App</h1>
             <Todos />
           </Fragment>
