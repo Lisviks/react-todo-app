@@ -13,8 +13,8 @@ const LoginForm = ({ showSingUp, login }) => {
   return (
     <form className='login-form' onSubmit={handleSubmit}>
       <h1>Login</h1>
-      <input type='email' name='email' placeholder='Email' />
-      <input type='password' name='password' placeholder='Password' />
+      <input type='email' name='email' placeholder='Email' required />
+      <input type='password' name='password' placeholder='Password' required />
       <button className='btn'>Login</button>
       <span>
         Need account?{' '}
