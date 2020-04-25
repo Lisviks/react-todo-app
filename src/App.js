@@ -5,6 +5,7 @@ import LoginForm from './components/LoginForm';
 import SignUpForm from './components/SignUpForm';
 import { firestore, auth } from './config/firebase';
 import Loader from './components/Loader';
+import { connect } from 'react-redux';
 
 class App extends Component {
   state = {
@@ -43,25 +44,23 @@ class App extends Component {
   }
 
   login = async (email, password) => {
-    try {
-      this.setState({ loading: true });
-
-      const res = await auth.signInWithEmailAndPassword(email, password);
-
-      const user = await firestore.collection('users').doc(res.user.uid).get();
-      const userData = user.data();
-
-      this.setState({
-        user: {
-          id: res.user.uid,
-          username: userData.username,
-          email: userData.email,
-          loading: false,
-        },
-      });
-    } catch (err) {
-      console.log(err);
-    }
+    // try {
+    //   this.setState({ loading: true });
+    //   const res = await auth.signInWithEmailAndPassword(email, password);
+    //   const user = await firestore.collection('users').doc(res.user.uid).get();
+    //   const userData = user.data();
+    //   this.setState({
+    //     user: {
+    //       id: res.user.uid,
+    //       username: userData.username,
+    //       email: userData.email,
+    //       loading: false,
+    //     },
+    //   });
+    // } catch (err) {
+    //   this.setState({ loading: false });
+    //   console.log(err);
+    // }
   };
 
   signUp = async (username, email, password) => {
@@ -80,6 +79,7 @@ class App extends Component {
 
       this.setState({ loading: false });
     } catch (err) {
+      this.setState({ loading: false });
       console.log(err);
     }
   };
@@ -155,4 +155,10 @@ class App extends Component {
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    auth: state.auth,
+  };
+};
+
+export default connect(mapStateToProps)(App);
