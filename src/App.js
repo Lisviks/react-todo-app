@@ -4,12 +4,14 @@ import ThemeSwitch from './components/ThemeSwitch';
 import LoginForm from './components/LoginForm';
 import SignUpForm from './components/SignUpForm';
 import { firestore, auth } from './config/firebase';
+import Loader from './components/Loader';
 
 class App extends Component {
   state = {
     darkTheme: false,
     user: null,
     loginForm: true,
+    loading: true,
   };
 
   componentDidMount() {
@@ -33,14 +35,17 @@ class App extends Component {
             email: userData.email,
           },
         });
+        this.setState({ loading: false });
       } else {
-        this.setState({ user: null });
+        this.setState({ user: null, loading: false });
       }
     });
   }
 
   login = async (email, password) => {
     try {
+      this.setState({ loading: true });
+
       const res = await auth.signInWithEmailAndPassword(email, password);
 
       const user = await firestore.collection('users').doc(res.user.uid).get();
@@ -51,6 +56,7 @@ class App extends Component {
           id: res.user.uid,
           username: userData.username,
           email: userData.email,
+          loading: false,
         },
       });
     } catch (err) {
@@ -60,6 +66,8 @@ class App extends Component {
 
   signUp = async (username, email, password) => {
     try {
+      this.setState({ loading: true });
+
       const res = await auth.createUserWithEmailAndPassword(email, password);
 
       this.setState({ user: { id: res.user.uid, username, email } });
@@ -69,6 +77,8 @@ class App extends Component {
         username,
         createdAt: Date.now(),
       });
+
+      this.setState({ loading: false });
     } catch (err) {
       console.log(err);
     }
@@ -107,30 +117,36 @@ class App extends Component {
   render() {
     return (
       <div className='container'>
-        <div className='header'>
-          <ThemeSwitch
-            switchTheme={this.switchTheme}
-            currentTheme={this.currentTheme}
-          />
-          {this.state.user && (
-            <button className='btn logout-btn' onClick={this.logout}>
-              Logout
-            </button>
-          )}
-        </div>
-        {this.state.user ? (
-          <Fragment>
-            <div className='todo-app'>
-              <h1>Todo App</h1>
-              <Todos user={this.state.user} />
-            </div>
-          </Fragment>
+        {this.state.loading ? (
+          <Loader />
         ) : (
           <Fragment>
-            {this.state.loginForm ? (
-              <LoginForm showSingUp={this.showSignUp} login={this.login} />
+            <div className='header'>
+              <ThemeSwitch
+                switchTheme={this.switchTheme}
+                currentTheme={this.currentTheme}
+              />
+              {this.state.user && (
+                <button className='btn logout-btn' onClick={this.logout}>
+                  Logout
+                </button>
+              )}
+            </div>
+            {this.state.user ? (
+              <Fragment>
+                <div className='todo-app'>
+                  <h1>Todo App</h1>
+                  <Todos user={this.state.user} />
+                </div>
+              </Fragment>
             ) : (
-              <SignUpForm showLogin={this.showLogin} signUp={this.signUp} />
+              <Fragment>
+                {this.state.loginForm ? (
+                  <LoginForm showSingUp={this.showSignUp} login={this.login} />
+                ) : (
+                  <SignUpForm showLogin={this.showLogin} signUp={this.signUp} />
+                )}
+              </Fragment>
             )}
           </Fragment>
         )}
