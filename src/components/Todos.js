@@ -4,6 +4,7 @@ import AddTodo from './AddTodo';
 import { firestore } from '../config/firebase';
 import PageLimit from './PageLimit';
 import Filter from './Filter';
+import Loader from './Loader';
 
 class Todos extends Component {
   state = {
@@ -18,6 +19,8 @@ class Todos extends Component {
     // Filter
     filter: 'all',
     filteredTodos: [],
+    // Loader
+    loading: true,
   };
 
   updateCurrentTodos = (todos, pageLimit = this.state.pageLimit) => {
@@ -45,7 +48,7 @@ class Todos extends Component {
 
     const currentTodos = this.updateCurrentTodos(todos);
 
-    this.setState({ todos, currentTodos });
+    this.setState({ todos, currentTodos, loading: false });
   }
 
   checkComplete = (id) => {
@@ -98,6 +101,8 @@ class Todos extends Component {
 
     // Add new todo
     if (!this.state.formState) {
+      if (!this.state.formText) return;
+
       const res = await firestore
         .collection('users')
         .doc(this.props.user.id)
@@ -122,6 +127,8 @@ class Todos extends Component {
 
       // Edit todo
     } else {
+      if (!this.state.formText) return;
+
       const todos = this.state.todos.map((todo) => {
         if (this.state.formState.id === todo.id) {
           todo.text = this.state.formText;
@@ -200,7 +207,9 @@ class Todos extends Component {
   };
 
   render() {
-    const todosList = this.state.currentTodos.length ? (
+    const todosList = this.state.loading ? (
+      <Loader />
+    ) : this.state.currentTodos.length ? (
       this.state.currentTodos.map((todo) => (
         <Todo
           todo={todo}
