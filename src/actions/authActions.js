@@ -41,3 +41,16 @@ export const signUp = (username, email, password) => {
     }
   };
 };
+
+export const logout = () => {
+  return (dispatch) => {
+    auth.signOut();
+
+    dispatch({ type: 'LOGOUT' });
+  };
+};
+
+export const onloadLogin = (id, username, email) => ({
+  type: 'ONLOAD_LOGIN',
+  payload: { id, username, email },
+});

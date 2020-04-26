@@ -6,6 +6,7 @@ import SignUpForm from './components/SignUpForm';
 import { firestore, auth } from './config/firebase';
 import Loader from './components/Loader';
 import { connect } from 'react-redux';
+import { logout, onloadLogin } from './actions/authActions';
 
 class App extends Component {
   state = {
@@ -29,14 +30,16 @@ class App extends Component {
         const res = await firestore.collection('users').doc(user.uid).get();
         const userData = res.data();
 
-        this.props.dispatch({
-          type: 'LOGIN',
-          payload: {
-            id: user.uid,
-            username: userData.username,
-            email: userData.email,
-          },
-        });
+        this.props.onloadLogin(user.uid, userData.username, userData.email);
+
+        // this.props.dispatch({
+        //   type: 'LOGIN',
+        //   payload: {
+        //     id: user.uid,
+        //     username: userData.username,
+        //     email: userData.email,
+        //   },
+        // });
         this.setState({ loading: false });
       } else {
         this.setState({ user: null, loading: false });
@@ -44,10 +47,10 @@ class App extends Component {
     });
   }
 
-  logout = () => {
-    auth.signOut();
-    this.setState({ user: null });
-  };
+  // logout = () => {
+  //   auth.signOut();
+  //   this.setState({ user: null });
+  // };
 
   switchTheme = () => {
     this.setState({ darkTheme: !this.state.darkTheme }, () =>
@@ -87,7 +90,7 @@ class App extends Component {
                 currentTheme={this.currentTheme}
               />
               {this.props.user && (
-                <button className='btn logout-btn' onClick={this.logout}>
+                <button className='btn logout-btn' onClick={this.props.logout}>
                   Logout
                 </button>
               )}
@@ -121,4 +124,6 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(App);
+const mapDispatchToProps = { logout, onloadLogin };
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
