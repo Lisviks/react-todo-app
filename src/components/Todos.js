@@ -6,7 +6,7 @@ import PageLimit from './PageLimit';
 import Filter from './Filter';
 import Loader from './Loader';
 import { connect } from 'react-redux';
-import { loadTodos, addTodo } from '../actions/todosActions';
+import { loadTodos, addTodo, editTodo } from '../actions/todosActions';
 
 class Todos extends Component {
   state = {
@@ -104,21 +104,26 @@ class Todos extends Component {
     } else {
       if (!this.state.formText) return;
 
-      const todos = this.state.todos.map((todo) => {
-        if (this.state.formState.id === todo.id) {
-          todo.text = this.state.formText;
+      // const todos = this.state.todos.map((todo) => {
+      //   if (this.state.formState.id === todo.id) {
+      //     todo.text = this.state.formText;
 
-          firestore
-            .collection('users')
-            .doc(this.props.user.id)
-            .collection('todos')
-            .doc(todo.id)
-            .update({ text: todo.text });
-        }
-        return todo;
-      });
+      //     firestore
+      //       .collection('users')
+      //       .doc(this.props.user.id)
+      //       .collection('todos')
+      //       .doc(todo.id)
+      //       .update({ text: todo.text });
+      //   }
+      //   return todo;
+      // });
+      this.props.editTodo(
+        this.props.user.id,
+        this.state.formState.id,
+        this.state.formText
+      );
 
-      this.setState({ todos, formText: '', formState: null });
+      this.setState({ formText: '', formState: null });
     }
   };
 
@@ -226,6 +231,6 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = { loadTodos, addTodo };
+const mapDispatchToProps = { loadTodos, addTodo, editTodo };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Todos);

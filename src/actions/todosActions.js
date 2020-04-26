@@ -34,18 +34,25 @@ export const addTodo = (userId, text) => {
       .collection('users')
       .doc(userId)
       .collection('todos')
-      .add({
-        ...newTodo,
-        // text,
-        // complete: false,
-        // createdAt: Date.now(),
-      });
-
-    // const newTodo = {
-    //   id: res.id,
-
-    // };
+      .add({ ...newTodo });
 
     dispatch({ type: 'ADD_TODO', payload: { ...newTodo, id: res.id } });
+  };
+};
+
+export const editTodo = (userId, todoId, text) => {
+  return async (dispatch) => {
+    try {
+      firestore
+        .collection('users')
+        .doc(userId)
+        .collection('todos')
+        .doc(todoId)
+        .update({ text });
+
+      dispatch({ type: 'EDIT_TODO', payload: { todoId, text } });
+    } catch (err) {
+      console.log(err);
+    }
   };
 };
