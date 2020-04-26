@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import Todo from './Todo';
 import AddTodo from './AddTodo';
-import { firestore } from '../config/firebase';
 import PageLimit from './PageLimit';
 import Filter from './Filter';
 import Loader from './Loader';
@@ -11,11 +10,11 @@ import {
   addTodo,
   editTodo,
   completeTodo,
+  deleteTodo,
 } from '../actions/todosActions';
 
 class Todos extends Component {
   state = {
-    todos: [],
     formText: '',
     formState: null,
     // Pagination
@@ -45,7 +44,7 @@ class Todos extends Component {
 
     const currentTodos = this.updateCurrentTodos(this.props.todos);
 
-    this.setState({ todos: this.props.todos, currentTodos, loading: false });
+    this.setState({ currentTodos, loading: false });
   }
 
   checkComplete = (todoId) => {
@@ -60,15 +59,8 @@ class Todos extends Component {
     this.setState({ currentTodos });
   };
 
-  deleteTodo = async (id) => {
-    const todos = this.state.todos.filter((todo) => todo.id !== id);
-    this.setState({ todos });
-    await firestore
-      .collection('users')
-      .doc(this.props.user.id)
-      .collection('todos')
-      .doc(id)
-      .delete();
+  deleteTodo = async (todoId) => {
+    await this.props.deleteTodo(this.props.user.id, todoId);
 
     const currentTodos = this.updateCurrentTodos(this.filterTodos());
 
@@ -77,7 +69,7 @@ class Todos extends Component {
 
   startEdit = (id, text) => {
     this.setState({
-      formState: this.state.todos.filter((todo) => todo.id === id)[0],
+      formState: this.props.todos.filter((todo) => todo.id === id)[0],
       formText: text,
     });
   };
@@ -144,7 +136,7 @@ class Todos extends Component {
 
   setPageLimit = async (newPageLimit) => {
     const currentTodos = this.updateCurrentTodos(
-      this.state.todos,
+      this.props.todos,
       newPageLimit
     );
 
@@ -156,7 +148,7 @@ class Todos extends Component {
   };
 
   filterTodos = (filter = this.state.filter) => {
-    const filteredTodos = [...this.state.todos].filter((todo) => {
+    const filteredTodos = [...this.props.todos].filter((todo) => {
       if (filter === 'active') return !todo.complete;
       if (filter === 'complete') return todo.complete;
       return todo;
@@ -216,6 +208,12 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = { loadTodos, addTodo, editTodo, completeTodo };
+const mapDispatchToProps = {
+  loadTodos,
+  addTodo,
+  editTodo,
+  completeTodo,
+  deleteTodo,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Todos);

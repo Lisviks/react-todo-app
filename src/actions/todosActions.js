@@ -58,14 +58,35 @@ export const editTodo = (userId, todoId, text) => {
 };
 
 export const completeTodo = (userId, todoId, complete) => {
-  return async (dispatch) => {
-    firestore
-      .collection('users')
-      .doc(userId)
-      .collection('todos')
-      .doc(todoId)
-      .update({ complete });
+  return (dispatch) => {
+    try {
+      firestore
+        .collection('users')
+        .doc(userId)
+        .collection('todos')
+        .doc(todoId)
+        .update({ complete });
 
-    dispatch({ type: 'COMPLETE_TODO', payload: todoId });
+      dispatch({ type: 'COMPLETE_TODO', payload: todoId });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+};
+
+export const deleteTodo = (userId, todoId) => {
+  return (dispatch) => {
+    try {
+      firestore
+        .collection('users')
+        .doc(userId)
+        .collection('todos')
+        .doc(todoId)
+        .delete();
+
+      dispatch({ type: 'DELETE_TODO', payload: todoId });
+    } catch (err) {
+      console.log(err);
+    }
   };
 };
