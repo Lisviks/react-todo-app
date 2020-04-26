@@ -5,6 +5,8 @@ import { firestore } from '../config/firebase';
 import PageLimit from './PageLimit';
 import Filter from './Filter';
 import Loader from './Loader';
+import { connect } from 'react-redux';
+import { loadTodos, addTodo } from '../actions/todosActions';
 
 class Todos extends Component {
   state = {
@@ -34,21 +36,11 @@ class Todos extends Component {
   };
 
   async componentDidMount() {
-    const res = await firestore
-      .collection('users')
-      .doc(this.props.user.id)
-      .collection('todos')
-      .orderBy('createdAt', 'desc')
-      .get();
+    await this.props.loadTodos(this.props.user.id);
 
-    const todos = res.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
+    const currentTodos = this.updateCurrentTodos(this.props.todos);
 
-    const currentTodos = this.updateCurrentTodos(todos);
-
-    this.setState({ todos, currentTodos, loading: false });
+    this.setState({ todos: this.props.todos, currentTodos, loading: false });
   }
 
   checkComplete = (id) => {
@@ -102,28 +94,11 @@ class Todos extends Component {
     // Add new todo
     if (!this.state.formState) {
       if (!this.state.formText) return;
-
-      const res = await firestore
-        .collection('users')
-        .doc(this.props.user.id)
-        .collection('todos')
-        .add({
-          text: this.state.formText,
-          complete: false,
-          createdAt: Date.now(),
-        });
-
-      const newTodo = {
-        id: res.id,
-        text: this.state.formText,
-        complete: false,
-      };
-
-      const todos = [{ ...newTodo }, ...this.state.todos];
+      this.props.addTodo(this.props.user.id, this.state.formText);
 
       const currentTodos = this.updateCurrentTodos(this.filterTodos());
 
-      this.setState({ todos, formText: '', currentTodos });
+      this.setState({ formText: '', currentTodos });
 
       // Edit todo
     } else {
@@ -245,4 +220,12 @@ class Todos extends Component {
   }
 }
 
-export default Todos;
+const mapStateToProps = (state) => {
+  return {
+    todos: state.todos.todos,
+  };
+};
+
+const mapDispatchToProps = { loadTodos, addTodo };
+
+export default connect(mapStateToProps, mapDispatchToProps)(Todos);
