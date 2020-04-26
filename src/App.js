@@ -44,27 +44,6 @@ class App extends Component {
     });
   }
 
-  signUp = async (username, email, password) => {
-    try {
-      this.setState({ loading: true });
-
-      const res = await auth.createUserWithEmailAndPassword(email, password);
-
-      this.setState({ user: { id: res.user.uid, username, email } });
-
-      firestore.collection('users').doc(res.user.uid).set({
-        email,
-        username,
-        createdAt: Date.now(),
-      });
-
-      this.setState({ loading: false });
-    } catch (err) {
-      this.setState({ loading: false });
-      console.log(err);
-    }
-  };
-
   logout = () => {
     auth.signOut();
     this.setState({ user: null });
@@ -107,25 +86,25 @@ class App extends Component {
                 switchTheme={this.switchTheme}
                 currentTheme={this.currentTheme}
               />
-              {this.props.auth && (
+              {this.props.user && (
                 <button className='btn logout-btn' onClick={this.logout}>
                   Logout
                 </button>
               )}
             </div>
-            {this.props.auth ? (
+            {this.props.user ? (
               <Fragment>
                 <div className='todo-app'>
                   <h1>Todo App</h1>
-                  <Todos user={this.props.auth.user} />
+                  <Todos user={this.props.user} />
                 </div>
               </Fragment>
             ) : (
               <Fragment>
                 {this.state.loginForm ? (
-                  <LoginForm showSingUp={this.showSignUp} login={this.login} />
+                  <LoginForm showSignUp={this.showSignUp} />
                 ) : (
-                  <SignUpForm showLogin={this.showLogin} signUp={this.signUp} />
+                  <SignUpForm showLogin={this.showLogin} />
                 )}
               </Fragment>
             )}
@@ -138,7 +117,7 @@ class App extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    auth: state.auth,
+    user: state.auth.user,
   };
 };
 

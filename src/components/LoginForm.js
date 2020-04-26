@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { login } from '../actions/authActions';
 
-const LoginForm = ({ showSingUp, login }) => {
+const LoginForm = ({ showSignUp, login }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
@@ -20,7 +20,7 @@ const LoginForm = ({ showSingUp, login }) => {
       <button className='btn'>Login</button>
       <span>
         Need account?{' '}
-        <button className='change-form-btn' onClick={showSingUp}>
+        <button className='change-form-btn' onClick={showSignUp}>
           Sign up
         </button>
       </span>

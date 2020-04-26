@@ -10,6 +10,16 @@ const authReducer = (state = {}, action) => {
           email: action.payload.email,
         },
       };
+    case 'SIGN_UP':
+      console.log(action);
+      return {
+        ...state,
+        user: {
+          id: action.payload.id,
+          username: action.payload.username,
+          email: action.payload.email,
+        },
+      };
     default:
       return state;
   }

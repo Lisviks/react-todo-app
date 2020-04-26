@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { signUp } from '../actions/authActions';
 
 const SignUpForm = ({ showLogin, signUp }) => {
   const handleSubmit = (e) => {
@@ -28,4 +30,6 @@ const SignUpForm = ({ showLogin, signUp }) => {
   );
 };
 
-export default SignUpForm;
+const mapDispatchToProps = { signUp };
+
+export default connect(null, mapDispatchToProps)(SignUpForm);

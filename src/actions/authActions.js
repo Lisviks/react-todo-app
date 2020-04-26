@@ -20,3 +20,24 @@ export const login = (email, password) => {
     }
   };
 };
+
+export const signUp = (username, email, password) => {
+  return async (dispatch) => {
+    try {
+      const res = await auth.createUserWithEmailAndPassword(email, password);
+
+      await firestore.collection('users').doc(res.user.uid).set({
+        email,
+        username,
+        createdAt: Date.now(),
+      });
+
+      dispatch({
+        type: 'SIGN_UP',
+        payload: { id: res.user.uid, username, email },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+};
