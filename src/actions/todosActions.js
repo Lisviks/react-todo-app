@@ -41,7 +41,7 @@ export const addTodo = (userId, text) => {
 };
 
 export const editTodo = (userId, todoId, text) => {
-  return async (dispatch) => {
+  return (dispatch) => {
     try {
       firestore
         .collection('users')
@@ -54,5 +54,18 @@ export const editTodo = (userId, todoId, text) => {
     } catch (err) {
       console.log(err);
     }
+  };
+};
+
+export const completeTodo = (userId, todoId, complete) => {
+  return async (dispatch) => {
+    firestore
+      .collection('users')
+      .doc(userId)
+      .collection('todos')
+      .doc(todoId)
+      .update({ complete });
+
+    dispatch({ type: 'COMPLETE_TODO', payload: todoId });
   };
 };

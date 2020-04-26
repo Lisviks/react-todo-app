@@ -6,7 +6,12 @@ import PageLimit from './PageLimit';
 import Filter from './Filter';
 import Loader from './Loader';
 import { connect } from 'react-redux';
-import { loadTodos, addTodo, editTodo } from '../actions/todosActions';
+import {
+  loadTodos,
+  addTodo,
+  editTodo,
+  completeTodo,
+} from '../actions/todosActions';
 
 class Todos extends Component {
   state = {
@@ -43,23 +48,16 @@ class Todos extends Component {
     this.setState({ todos: this.props.todos, currentTodos, loading: false });
   }
 
-  checkComplete = (id) => {
-    const todos = [...this.state.todos].map((todo) => {
-      if (todo.id === id) {
-        todo.complete = !todo.complete;
-        firestore
-          .collection('users')
-          .doc(this.props.user.id)
-          .collection('todos')
-          .doc(id)
-          .update({ complete: todo.complete });
-      }
-      return todo;
-    });
+  checkComplete = (todoId) => {
+    const todo = this.props.todos.filter((todo) => todo.id === todoId)[0];
+    const todoIndex = this.props.todos.indexOf(todo);
+    const complete = !this.props.todos[todoIndex].complete;
+
+    this.props.completeTodo(this.props.user.id, todoId, complete);
 
     const currentTodos = this.updateCurrentTodos(this.filterTodos());
 
-    this.setState({ todos, currentTodos });
+    this.setState({ currentTodos });
   };
 
   deleteTodo = async (id) => {
@@ -104,19 +102,6 @@ class Todos extends Component {
     } else {
       if (!this.state.formText) return;
 
-      // const todos = this.state.todos.map((todo) => {
-      //   if (this.state.formState.id === todo.id) {
-      //     todo.text = this.state.formText;
-
-      //     firestore
-      //       .collection('users')
-      //       .doc(this.props.user.id)
-      //       .collection('todos')
-      //       .doc(todo.id)
-      //       .update({ text: todo.text });
-      //   }
-      //   return todo;
-      // });
       this.props.editTodo(
         this.props.user.id,
         this.state.formState.id,
@@ -231,6 +216,6 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = { loadTodos, addTodo, editTodo };
+const mapDispatchToProps = { loadTodos, addTodo, editTodo, completeTodo };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Todos);

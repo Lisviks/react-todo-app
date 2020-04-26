@@ -25,6 +25,19 @@ const todosReducer = (state = [], action) => {
           }),
         ],
       };
+    case 'COMPLETE_TODO':
+      console.log(action);
+      return {
+        ...state,
+        todos: [
+          ...state.todos.map((todo) => {
+            if (todo.id === action.payload) {
+              todo.complete = !todo.complete;
+            }
+            return todo;
+          }),
+        ],
+      };
     default:
       return state;
   }
