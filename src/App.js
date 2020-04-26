@@ -10,7 +10,6 @@ import { connect } from 'react-redux';
 class App extends Component {
   state = {
     darkTheme: false,
-    user: null,
     loginForm: true,
     loading: true,
   };
@@ -29,8 +28,10 @@ class App extends Component {
       if (user) {
         const res = await firestore.collection('users').doc(user.uid).get();
         const userData = res.data();
-        this.setState({
-          user: {
+
+        this.props.dispatch({
+          type: 'LOGIN',
+          payload: {
             id: user.uid,
             username: userData.username,
             email: userData.email,
@@ -42,26 +43,6 @@ class App extends Component {
       }
     });
   }
-
-  login = async (email, password) => {
-    // try {
-    //   this.setState({ loading: true });
-    //   const res = await auth.signInWithEmailAndPassword(email, password);
-    //   const user = await firestore.collection('users').doc(res.user.uid).get();
-    //   const userData = user.data();
-    //   this.setState({
-    //     user: {
-    //       id: res.user.uid,
-    //       username: userData.username,
-    //       email: userData.email,
-    //       loading: false,
-    //     },
-    //   });
-    // } catch (err) {
-    //   this.setState({ loading: false });
-    //   console.log(err);
-    // }
-  };
 
   signUp = async (username, email, password) => {
     try {
@@ -126,17 +107,17 @@ class App extends Component {
                 switchTheme={this.switchTheme}
                 currentTheme={this.currentTheme}
               />
-              {this.state.user && (
+              {this.props.auth && (
                 <button className='btn logout-btn' onClick={this.logout}>
                   Logout
                 </button>
               )}
             </div>
-            {this.state.user ? (
+            {this.props.auth ? (
               <Fragment>
                 <div className='todo-app'>
                   <h1>Todo App</h1>
-                  <Todos user={this.state.user} />
+                  <Todos user={this.props.auth.user} />
                 </div>
               </Fragment>
             ) : (
