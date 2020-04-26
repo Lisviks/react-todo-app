@@ -31,26 +31,12 @@ class App extends Component {
         const userData = res.data();
 
         this.props.onloadLogin(user.uid, userData.username, userData.email);
-
-        // this.props.dispatch({
-        //   type: 'LOGIN',
-        //   payload: {
-        //     id: user.uid,
-        //     username: userData.username,
-        //     email: userData.email,
-        //   },
-        // });
         this.setState({ loading: false });
       } else {
         this.setState({ user: null, loading: false });
       }
     });
   }
-
-  // logout = () => {
-  //   auth.signOut();
-  //   this.setState({ user: null });
-  // };
 
   switchTheme = () => {
     this.setState({ darkTheme: !this.state.darkTheme }, () =>
