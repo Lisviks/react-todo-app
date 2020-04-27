@@ -12,6 +12,7 @@ import {
   completeTodo,
   deleteTodo,
   nextPage,
+  prevPage,
 } from '../actions/todosActions';
 
 class Todos extends Component {
@@ -54,9 +55,9 @@ class Todos extends Component {
 
     this.props.completeTodo(this.props.user.id, todoId, complete);
 
-    const currentTodos = this.updateCurrentTodos(this.filterTodos());
+    // const currentTodos = this.updateCurrentTodos(this.filterTodos());
 
-    this.setState({ currentTodos });
+    // this.setState({ currentTodos });
   };
 
   deleteTodo = async (todoId) => {
@@ -102,36 +103,6 @@ class Todos extends Component {
 
       this.setState({ formText: '', formState: null });
     }
-  };
-
-  handleNext = async () => {
-    const { currentTodos, currentPage, pageLimit } = this.state;
-
-    if (currentTodos.length < pageLimit) return;
-
-    const todos = [...this.filterTodos()]
-      .splice(currentPage * pageLimit)
-      .splice(0, pageLimit);
-
-    this.setState({
-      currentTodos: todos,
-      currentPage: currentPage + 1,
-    });
-  };
-
-  handlePrev = async () => {
-    const { currentPage, pageLimit } = this.state;
-
-    if (currentPage === 1) return;
-
-    const todos = [...this.filterTodos()]
-      .splice(currentPage * pageLimit - pageLimit * 2)
-      .splice(0, pageLimit);
-
-    this.setState({
-      currentTodos: todos,
-      currentPage: currentPage - 1,
-    });
   };
 
   setPageLimit = async (newPageLimit) => {
@@ -190,7 +161,7 @@ class Todos extends Component {
         />
         <Filter handleFilterClick={this.handleFilterClick} />
         <ul className='list'>{todosList}</ul>
-        <button className='btn' onClick={this.handlePrev}>
+        <button className='btn' onClick={this.props.prevPage}>
           Previous
         </button>
         <button className='btn' onClick={this.props.nextPage}>
@@ -216,6 +187,7 @@ const mapDispatchToProps = {
   completeTodo,
   deleteTodo,
   nextPage,
+  prevPage,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Todos);

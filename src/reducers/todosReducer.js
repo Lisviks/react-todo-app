@@ -56,6 +56,13 @@ const todosReducer = (state = initState, action) => {
         currentTodos: action.payload.currentTodos,
         currentPage: action.payload.currentPage,
       };
+    case 'PREV_PAGE':
+      console.log(action);
+      return {
+        ...state,
+        currentTodos: action.payload.currentTodos,
+        currentPage: action.payload.currentPage,
+      };
     default:
       return state;
   }

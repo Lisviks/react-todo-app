@@ -123,4 +123,21 @@ export const nextPage = () => {
   };
 };
 
-export const prevPage = () => {};
+export const prevPage = () => {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    const { currentPage, pageLimit } = state.todos;
+
+    if (currentPage === 1) return;
+
+    const todos = [...state.todos.todos]
+      .splice(currentPage * pageLimit - pageLimit * 2)
+      .splice(0, pageLimit);
+
+    dispatch({
+      type: 'PREV_PAGE',
+      payload: { currentTodos: todos, currentPage: currentPage - 1 },
+    });
+  };
+};
