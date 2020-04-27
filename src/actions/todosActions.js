@@ -1,13 +1,23 @@
 import { firestore } from '../config/firebase';
 
-const updateCurrentTodos = (todos, state) => {
-  const { currentPage, pageLimit } = state;
-  let currentTodos;
-  currentTodos = [...todos]
+const updateCurrentTodos = (todos, state, currentPage) => {
+  const { pageLimit } = state;
+  if (!currentPage) currentPage = state.currentPage;
+  const currentTodos = [...todos]
     .splice(currentPage * pageLimit - pageLimit)
     .splice(0, pageLimit);
 
   return currentTodos;
+};
+
+const filterTodos = (filter, todos) => {
+  const filteredTodos = [...todos].filter((todo) => {
+    if (filter === 'active') return !todo.complete;
+    if (filter === 'complete') return todo.complete;
+    return todo;
+  });
+  console.log(filteredTodos);
+  return filteredTodos;
 };
 
 export const loadTodos = (userId) => {
@@ -28,7 +38,10 @@ export const loadTodos = (userId) => {
       const state = getState();
       const currentTodos = updateCurrentTodos(todos, state.todos);
 
-      dispatch({ type: 'LOAD_TODOS', payload: { todos, currentTodos } });
+      dispatch({
+        type: 'LOAD_TODOS',
+        payload: { todos, currentTodos, filteredTodos: todos },
+      });
     } catch (err) {
       console.log(err);
     }
@@ -36,7 +49,8 @@ export const loadTodos = (userId) => {
 };
 
 export const addTodo = (userId, text) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
+    const state = getState();
     const newTodo = {
       text,
       complete: false,
@@ -49,7 +63,14 @@ export const addTodo = (userId, text) => {
       .collection('todos')
       .add({ ...newTodo });
 
-    dispatch({ type: 'ADD_TODO', payload: { ...newTodo, id: res.id } });
+    const todos = [{ ...newTodo, id: res.id }, ...state.todos.todos];
+    const filteredTodos = filterTodos(state.todos.filter, todos);
+    const currentTodos = updateCurrentTodos(filteredTodos, state.todos);
+
+    dispatch({
+      type: 'ADD_TODO',
+      payload: { todo: { ...newTodo, id: res.id }, currentTodos },
+    });
   };
 };
 
@@ -71,16 +92,28 @@ export const editTodo = (userId, todoId, text) => {
 };
 
 export const completeTodo = (userId, todoId, complete) => {
-  return (dispatch) => {
+  return async (dispatch, getState) => {
     try {
-      firestore
+      const state = getState();
+      const todos = state.todos.todos.map((todo) => {
+        if (todo.id === todoId) todo.complete = !todo.complete;
+        return todo;
+      });
+      const filteredTodos = filterTodos(state.todos.filter, todos);
+      const currentTodos = updateCurrentTodos(filteredTodos, state.todos);
+      console.log(currentTodos);
+
+      await firestore
         .collection('users')
         .doc(userId)
         .collection('todos')
         .doc(todoId)
         .update({ complete });
 
-      dispatch({ type: 'COMPLETE_TODO', payload: todoId });
+      dispatch({
+        type: 'COMPLETE_TODO',
+        payload: { todoId, currentTodos, complete },
+      });
     } catch (err) {
       console.log(err);
     }
@@ -88,7 +121,7 @@ export const completeTodo = (userId, todoId, complete) => {
 };
 
 export const deleteTodo = (userId, todoId) => {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     try {
       firestore
         .collection('users')
@@ -97,7 +130,13 @@ export const deleteTodo = (userId, todoId) => {
         .doc(todoId)
         .delete();
 
-      dispatch({ type: 'DELETE_TODO', payload: todoId });
+      const state = getState();
+      const todos = [
+        ...state.todos.filteredTodos.filter((todo) => todo.id !== todoId),
+      ];
+      const currentTodos = updateCurrentTodos(todos, state.todos);
+
+      dispatch({ type: 'DELETE_TODO', payload: { todoId, currentTodos } });
     } catch (err) {
       console.log(err);
     }
@@ -112,7 +151,7 @@ export const nextPage = () => {
 
     if (currentTodos.length < pageLimit) return;
 
-    const todos = [...state.todos.todos]
+    const todos = [...state.todos.filteredTodos]
       .splice(currentPage * pageLimit)
       .splice(0, pageLimit);
 
@@ -131,13 +170,27 @@ export const prevPage = () => {
 
     if (currentPage === 1) return;
 
-    const todos = [...state.todos.todos]
+    const todos = [...state.todos.filteredTodos]
       .splice(currentPage * pageLimit - pageLimit * 2)
       .splice(0, pageLimit);
 
     dispatch({
       type: 'PREV_PAGE',
       payload: { currentTodos: todos, currentPage: currentPage - 1 },
+    });
+  };
+};
+
+export const filter = (filter) => {
+  return (dispatch, getState) => {
+    const state = getState();
+    const filteredTodos = filterTodos(filter, state.todos.todos);
+
+    const currentTodos = updateCurrentTodos(filteredTodos, state.todos, 1);
+
+    dispatch({
+      type: 'FILTER',
+      payload: { filter, filteredTodos, currentTodos },
     });
   };
 };

@@ -1,6 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { filter } from '../actions/todosActions';
 
-const Filter = ({ handleFilterClick }) => {
+const Filter = ({ filter }) => {
   const changeFilter = (e) => {
     document
       .querySelectorAll('button')
@@ -8,15 +10,15 @@ const Filter = ({ handleFilterClick }) => {
 
     switch (e.target.textContent) {
       case 'Active':
-        handleFilterClick('active');
+        filter('active');
         e.target.classList.toggle('active');
         break;
       case 'Complete':
-        handleFilterClick('complete');
+        filter('complete');
         e.target.classList.toggle('active');
         break;
       default:
-        handleFilterClick('all');
+        filter('all');
         e.target.classList.toggle('active');
         break;
     }
@@ -43,4 +45,8 @@ const Filter = ({ handleFilterClick }) => {
   );
 };
 
-export default Filter;
+const mapDispatchToProps = {
+  filter,
+};
+
+export default connect(null, mapDispatchToProps)(Filter);

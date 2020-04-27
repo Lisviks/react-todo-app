@@ -4,6 +4,9 @@ const initState = {
   currentTodos: [],
   currentPage: 1,
   pageLimit: 5,
+  // Filter
+  filter: 'all',
+  filteredTodos: [],
 };
 
 const todosReducer = (state = initState, action) => {
@@ -14,12 +17,14 @@ const todosReducer = (state = initState, action) => {
         ...state,
         todos: action.payload.todos,
         currentTodos: action.payload.currentTodos,
+        filteredTodos: action.payload.todos,
       };
     case 'ADD_TODO':
       console.log(action);
       return {
         ...state,
-        todos: [action.payload, ...state.todos],
+        todos: [action.payload.todo, ...state.todos],
+        currentTodos: action.payload.currentTodos,
       };
     case 'EDIT_TODO':
       console.log(action);
@@ -37,17 +42,19 @@ const todosReducer = (state = initState, action) => {
       return {
         ...state,
         todos: state.todos.map((todo) => {
-          if (todo.id === action.payload) {
-            todo.complete = !todo.complete;
+          if (todo.id === action.payload.todoId) {
+            todo.complete = action.payload.complete;
           }
           return todo;
         }),
+        currentTodos: action.payload.currentTodos,
       };
     case 'DELETE_TODO':
       console.log(action);
       return {
         ...state,
-        todos: state.todos.filter((todo) => todo.id !== action.payload),
+        todos: state.todos.filter((todo) => todo.id !== action.payload.todoId),
+        currentTodos: action.payload.currentTodos,
       };
     case 'NEXT_PAGE':
       console.log(action);
@@ -62,6 +69,15 @@ const todosReducer = (state = initState, action) => {
         ...state,
         currentTodos: action.payload.currentTodos,
         currentPage: action.payload.currentPage,
+      };
+    case 'FILTER':
+      console.log(action);
+      return {
+        ...state,
+        filter: action.payload.filter,
+        filteredTodos: action.payload.filteredTodos,
+        currentTodos: action.payload.currentTodos,
+        currentPage: 1,
       };
     default:
       return state;

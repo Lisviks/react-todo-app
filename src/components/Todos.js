@@ -54,18 +54,10 @@ class Todos extends Component {
     const complete = !this.props.todos[todoIndex].complete;
 
     this.props.completeTodo(this.props.user.id, todoId, complete);
-
-    // const currentTodos = this.updateCurrentTodos(this.filterTodos());
-
-    // this.setState({ currentTodos });
   };
 
-  deleteTodo = async (todoId) => {
-    await this.props.deleteTodo(this.props.user.id, todoId);
-
-    const currentTodos = this.updateCurrentTodos(this.filterTodos());
-
-    this.setState({ currentTodos });
+  deleteTodo = (todoId) => {
+    this.props.deleteTodo(this.props.user.id, todoId);
   };
 
   startEdit = (id, text) => {
@@ -87,9 +79,7 @@ class Todos extends Component {
       if (!this.state.formText) return;
       await this.props.addTodo(this.props.user.id, this.state.formText);
 
-      const currentTodos = this.updateCurrentTodos(this.filterTodos());
-
-      this.setState({ formText: '', currentTodos });
+      this.setState({ formText: '' });
 
       // Edit todo
     } else {
@@ -106,32 +96,15 @@ class Todos extends Component {
   };
 
   setPageLimit = async (newPageLimit) => {
-    const currentTodos = this.updateCurrentTodos(
-      this.props.todos,
-      newPageLimit
-    );
-
-    this.setState({
-      pageLimit: newPageLimit,
-      currentTodos,
-      currentPage: 1,
-    });
-  };
-
-  filterTodos = (filter = this.state.filter) => {
-    const filteredTodos = [...this.props.todos].filter((todo) => {
-      if (filter === 'active') return !todo.complete;
-      if (filter === 'complete') return todo.complete;
-      return todo;
-    });
-
-    this.setState({ filter });
-    return filteredTodos;
-  };
-
-  handleFilterClick = (filter) => {
-    const currentTodos = this.updateCurrentTodos(this.filterTodos(filter));
-    this.setState({ currentTodos });
+    // const currentTodos = this.updateCurrentTodos(
+    //   this.props.todos,
+    //   newPageLimit
+    // );
+    // this.setState({
+    //   pageLimit: newPageLimit,
+    //   currentTodos,
+    //   currentPage: 1,
+    // });
   };
 
   render() {
@@ -159,7 +132,7 @@ class Todos extends Component {
           handleFormChange={this.handleFormChange}
           handleFormSubmit={this.handleFormSubmit}
         />
-        <Filter handleFilterClick={this.handleFilterClick} />
+        <Filter />
         <ul className='list'>{todosList}</ul>
         <button className='btn' onClick={this.props.prevPage}>
           Previous
@@ -174,6 +147,7 @@ class Todos extends Component {
 }
 
 const mapStateToProps = (state) => {
+  console.log(state.todos);
   return {
     todos: state.todos.todos,
     currentTodos: state.todos.currentTodos,
