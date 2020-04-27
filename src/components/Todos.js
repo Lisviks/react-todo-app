@@ -11,6 +11,7 @@ import {
   editTodo,
   completeTodo,
   deleteTodo,
+  nextPage,
 } from '../actions/todosActions';
 
 class Todos extends Component {
@@ -21,7 +22,6 @@ class Todos extends Component {
     currentTodos: [],
     currentPage: 1,
     pageLimit: 5,
-    totalPagesLoaded: 1,
     // Filter
     filter: 'all',
     filteredTodos: [],
@@ -42,7 +42,7 @@ class Todos extends Component {
   async componentDidMount() {
     await this.props.loadTodos(this.props.user.id);
 
-    const currentTodos = this.updateCurrentTodos(this.props.todos);
+    const currentTodos = this.props.currentTodos;
 
     this.setState({ currentTodos, loading: false });
   }
@@ -84,7 +84,7 @@ class Todos extends Component {
     // Add new todo
     if (!this.state.formState) {
       if (!this.state.formText) return;
-      this.props.addTodo(this.props.user.id, this.state.formText);
+      await this.props.addTodo(this.props.user.id, this.state.formText);
 
       const currentTodos = this.updateCurrentTodos(this.filterTodos());
 
@@ -166,8 +166,8 @@ class Todos extends Component {
   render() {
     const todosList = this.state.loading ? (
       <Loader />
-    ) : this.state.currentTodos.length ? (
-      this.state.currentTodos.map((todo) => (
+    ) : this.props.currentTodos.length ? (
+      this.props.currentTodos.map((todo) => (
         <Todo
           todo={todo}
           checkComplete={this.checkComplete}
@@ -193,7 +193,7 @@ class Todos extends Component {
         <button className='btn' onClick={this.handlePrev}>
           Previous
         </button>
-        <button className='btn' onClick={this.handleNext}>
+        <button className='btn' onClick={this.props.nextPage}>
           Next
         </button>
         <PageLimit setPageLimit={this.setPageLimit} />
@@ -205,6 +205,7 @@ class Todos extends Component {
 const mapStateToProps = (state) => {
   return {
     todos: state.todos.todos,
+    currentTodos: state.todos.currentTodos,
   };
 };
 
@@ -214,6 +215,7 @@ const mapDispatchToProps = {
   editTodo,
   completeTodo,
   deleteTodo,
+  nextPage,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Todos);

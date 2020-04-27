@@ -1,7 +1,17 @@
 import { firestore } from '../config/firebase';
 
+const updateCurrentTodos = (todos, state) => {
+  const { currentPage, pageLimit } = state;
+  let currentTodos;
+  currentTodos = [...todos]
+    .splice(currentPage * pageLimit - pageLimit)
+    .splice(0, pageLimit);
+
+  return currentTodos;
+};
+
 export const loadTodos = (userId) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const res = await firestore
         .collection('users')
@@ -15,7 +25,10 @@ export const loadTodos = (userId) => {
         id: doc.id,
       }));
 
-      dispatch({ type: 'LOAD_TODOS', payload: todos });
+      const state = getState();
+      const currentTodos = updateCurrentTodos(todos, state.todos);
+
+      dispatch({ type: 'LOAD_TODOS', payload: { todos, currentTodos } });
     } catch (err) {
       console.log(err);
     }
@@ -90,3 +103,24 @@ export const deleteTodo = (userId, todoId) => {
     }
   };
 };
+
+export const nextPage = () => {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    const { currentTodos, currentPage, pageLimit } = state.todos;
+
+    if (currentTodos.length < pageLimit) return;
+
+    const todos = [...state.todos.todos]
+      .splice(currentPage * pageLimit)
+      .splice(0, pageLimit);
+
+    dispatch({
+      type: 'NEXT_PAGE',
+      payload: { currentTodos: todos, currentPage: currentPage + 1 },
+    });
+  };
+};
+
+export const prevPage = () => {};
