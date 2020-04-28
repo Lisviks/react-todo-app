@@ -7,6 +7,7 @@ import { firestore, auth } from './config/firebase';
 import Loader from './components/Loader';
 import { connect } from 'react-redux';
 import { logout, onloadLogin } from './actions/authActions';
+import { loadTheme, setTheme } from './actions/themeActions';
 
 class App extends Component {
   state = {
@@ -16,14 +17,7 @@ class App extends Component {
   };
 
   componentDidMount() {
-    const darkTheme = JSON.parse(localStorage.getItem('theme'));
-    this.setState({ darkTheme }, () => {
-      if (this.state.darkTheme) {
-        document.querySelector('body').classList = 'dark';
-      } else {
-        document.querySelector('body').classList = 'light';
-      }
-    });
+    this.props.loadTheme();
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -42,16 +36,14 @@ class App extends Component {
   }
 
   switchTheme = () => {
-    this.setState({ darkTheme: !this.state.darkTheme }, () =>
-      localStorage.setItem('theme', JSON.stringify(this.state.darkTheme))
-    );
+    let theme;
+    if (this.props.theme === 'light') theme = 'dark';
+    if (this.props.theme === 'dark') theme = 'light';
+
+    this.props.setTheme(theme);
 
     document.querySelector('body').classList.toggle('light');
     document.querySelector('body').classList.toggle('dark');
-  };
-
-  currentTheme = () => {
-    return this.state.darkTheme;
   };
 
   showSignUp = (e) => {
@@ -74,10 +66,7 @@ class App extends Component {
         ) : (
           <Fragment>
             <div className='header'>
-              <ThemeSwitch
-                switchTheme={this.switchTheme}
-                currentTheme={this.currentTheme}
-              />
+              <ThemeSwitch switchTheme={this.switchTheme} />
               {this.props.user && (
                 <button className='btn logout-btn' onClick={this.props.logout}>
                   Logout
@@ -108,13 +97,14 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state.auth);
+  console.log(state.theme);
   return {
     user: state.auth.user,
     loading: state.auth.loading,
+    theme: state.theme.theme,
   };
 };
 
-const mapDispatchToProps = { logout, onloadLogin };
+const mapDispatchToProps = { logout, onloadLogin, loadTheme, setTheme };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
