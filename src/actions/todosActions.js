@@ -194,3 +194,13 @@ export const filter = (filter) => {
     });
   };
 };
+
+export const setPageLimit = (newPageLimit) => {
+  return (dispatch, getState) => {
+    dispatch({ type: 'SET_PAGE_LIMIT', payload: newPageLimit });
+    const state = getState();
+    const currentTodos = updateCurrentTodos(state.todos.todos, state.todos, 1);
+
+    dispatch({ type: 'UPDATE_CURRENT_TODOS', payload: currentTodos });
+  };
+};

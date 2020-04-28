@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { setPageLimit } from '../actions/todosActions';
 
 class PageLimit extends Component {
   state = {
@@ -42,4 +44,8 @@ class PageLimit extends Component {
   }
 }
 
-export default PageLimit;
+const mapDispatchToProps = {
+  setPageLimit,
+};
+
+export default connect(null, mapDispatchToProps)(PageLimit);

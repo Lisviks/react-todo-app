@@ -19,25 +19,8 @@ class Todos extends Component {
   state = {
     formText: '',
     formState: null,
-    // Pagination
-    currentTodos: [],
-    currentPage: 1,
-    pageLimit: 5,
-    // Filter
-    filter: 'all',
-    filteredTodos: [],
     // Loader
     loading: true,
-  };
-
-  updateCurrentTodos = (todos, pageLimit = this.state.pageLimit) => {
-    const { currentPage } = this.state;
-    let currentTodos;
-    currentTodos = [...todos]
-      .splice(currentPage * pageLimit - pageLimit)
-      .splice(0, pageLimit);
-
-    return currentTodos;
   };
 
   async componentDidMount() {
@@ -95,18 +78,6 @@ class Todos extends Component {
     }
   };
 
-  setPageLimit = async (newPageLimit) => {
-    // const currentTodos = this.updateCurrentTodos(
-    //   this.props.todos,
-    //   newPageLimit
-    // );
-    // this.setState({
-    //   pageLimit: newPageLimit,
-    //   currentTodos,
-    //   currentPage: 1,
-    // });
-  };
-
   render() {
     const todosList = this.state.loading ? (
       <Loader />
@@ -140,7 +111,7 @@ class Todos extends Component {
         <button className='btn' onClick={this.props.nextPage}>
           Next
         </button>
-        <PageLimit setPageLimit={this.setPageLimit} />
+        <PageLimit />
       </Fragment>
     );
   }

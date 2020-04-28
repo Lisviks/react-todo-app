@@ -79,6 +79,16 @@ const todosReducer = (state = initState, action) => {
         currentTodos: action.payload.currentTodos,
         currentPage: 1,
       };
+    case 'SET_PAGE_LIMIT':
+      return {
+        ...state,
+        pageLimit: action.payload,
+      };
+    case 'UPDATE_CURRENT_TODOS':
+      return {
+        ...state,
+        currentTodos: action.payload,
+      };
     default:
       return state;
   }
