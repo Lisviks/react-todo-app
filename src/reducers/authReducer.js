@@ -1,4 +1,9 @@
-const authReducer = (state = {}, action) => {
+const initState = {
+  user: null,
+  loading: true,
+};
+
+const authReducer = (state = initState, action) => {
   switch (action.type) {
     case 'LOGIN':
       console.log(action);
@@ -8,6 +13,7 @@ const authReducer = (state = {}, action) => {
           id: action.payload.id,
           username: action.payload.username,
           email: action.payload.email,
+          loading: false,
         },
       };
     case 'SIGN_UP':
@@ -19,6 +25,7 @@ const authReducer = (state = {}, action) => {
           username: action.payload.username,
           email: action.payload.email,
         },
+        loading: false,
       };
     case 'LOGOUT':
       console.log(action);
@@ -30,11 +37,13 @@ const authReducer = (state = {}, action) => {
       console.log(action);
       return {
         ...state,
-        user: {
-          id: action.payload.id,
-          username: action.payload.username,
-          email: action.payload.email,
-        },
+        user: action.payload.user,
+        loading: false,
+      };
+    case 'SET_AUTH_LOADING':
+      return {
+        ...state,
+        loading: true,
       };
     default:
       return state;

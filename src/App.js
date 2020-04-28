@@ -30,10 +30,13 @@ class App extends Component {
         const res = await firestore.collection('users').doc(user.uid).get();
         const userData = res.data();
 
-        this.props.onloadLogin(user.uid, userData.username, userData.email);
-        this.setState({ loading: false });
+        this.props.onloadLogin({
+          id: user.uid,
+          username: userData.username,
+          email: userData.email,
+        });
       } else {
-        this.setState({ user: null, loading: false });
+        this.props.onloadLogin(null);
       }
     });
   }
@@ -66,7 +69,7 @@ class App extends Component {
   render() {
     return (
       <div className='container'>
-        {this.state.loading ? (
+        {this.props.loading ? (
           <Loader />
         ) : (
           <Fragment>
@@ -105,8 +108,10 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => {
+  console.log(state.auth);
   return {
     user: state.auth.user,
+    loading: state.auth.loading,
   };
 };
 

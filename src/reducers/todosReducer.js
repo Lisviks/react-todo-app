@@ -7,6 +7,8 @@ const initState = {
   // Filter
   filter: 'all',
   filteredTodos: [],
+  // Loader
+  loading: false,
 };
 
 const todosReducer = (state = initState, action) => {
@@ -18,6 +20,7 @@ const todosReducer = (state = initState, action) => {
         todos: action.payload.todos,
         currentTodos: action.payload.currentTodos,
         filteredTodos: action.payload.todos,
+        loading: action.payload.loading,
       };
     case 'ADD_TODO':
       console.log(action);
@@ -88,6 +91,11 @@ const todosReducer = (state = initState, action) => {
       return {
         ...state,
         currentTodos: action.payload,
+      };
+    case 'SET_LOADING':
+      return {
+        ...state,
+        loading: action.payload.loading,
       };
     default:
       return state;

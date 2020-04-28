@@ -16,13 +16,13 @@ const filterTodos = (filter, todos) => {
     if (filter === 'complete') return todo.complete;
     return todo;
   });
-  console.log(filteredTodos);
   return filteredTodos;
 };
 
 export const loadTodos = (userId) => {
   return async (dispatch, getState) => {
     try {
+      dispatch({ type: 'SET_LOADING', payload: { loading: true } });
       const res = await firestore
         .collection('users')
         .doc(userId)
@@ -40,7 +40,7 @@ export const loadTodos = (userId) => {
 
       dispatch({
         type: 'LOAD_TODOS',
-        payload: { todos, currentTodos, filteredTodos: todos },
+        payload: { todos, currentTodos, filteredTodos: todos, loading: false },
       });
     } catch (err) {
       console.log(err);

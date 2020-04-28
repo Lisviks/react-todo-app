@@ -3,6 +3,7 @@ import { auth, firestore } from '../config/firebase';
 export const login = (email, password) => {
   return async (dispatch) => {
     try {
+      dispatch({ type: 'SET_AUTH_LOADING' });
       const res = await auth.signInWithEmailAndPassword(email, password);
       const user = await firestore.collection('users').doc(res.user.uid).get();
       const userData = user.data();
@@ -24,6 +25,7 @@ export const login = (email, password) => {
 export const signUp = (username, email, password) => {
   return async (dispatch) => {
     try {
+      dispatch({ type: 'SET_AUTH_LOADING' });
       const res = await auth.createUserWithEmailAndPassword(email, password);
 
       await firestore.collection('users').doc(res.user.uid).set({
@@ -50,7 +52,7 @@ export const logout = () => {
   };
 };
 
-export const onloadLogin = (id, username, email) => ({
+export const onloadLogin = (user) => ({
   type: 'ONLOAD_LOGIN',
-  payload: { id, username, email },
+  payload: { user },
 });

@@ -79,7 +79,7 @@ class Todos extends Component {
   };
 
   render() {
-    const todosList = this.state.loading ? (
+    const todosList = this.props.loading ? (
       <Loader />
     ) : this.props.currentTodos.length ? (
       this.props.currentTodos.map((todo) => (
@@ -118,10 +118,10 @@ class Todos extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state.todos);
   return {
     todos: state.todos.todos,
     currentTodos: state.todos.currentTodos,
+    loading: state.todos.loading,
   };
 };
 
