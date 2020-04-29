@@ -14,7 +14,6 @@ const initState = {
 const todosReducer = (state = initState, action) => {
   switch (action.type) {
     case 'LOAD_TODOS':
-      console.log(action);
       return {
         ...state,
         todos: action.payload.todos,
@@ -23,7 +22,6 @@ const todosReducer = (state = initState, action) => {
         loading: action.payload.loading,
       };
     case 'ADD_TODO':
-      console.log(action);
       return {
         ...state,
         todos: [action.payload.todo, ...state.todos],
@@ -31,7 +29,6 @@ const todosReducer = (state = initState, action) => {
         filteredTodos: action.payload.filteredTodos,
       };
     case 'EDIT_TODO':
-      console.log(action);
       return {
         ...state,
         todos: state.todos.map((todo) => {
@@ -42,7 +39,6 @@ const todosReducer = (state = initState, action) => {
         }),
       };
     case 'COMPLETE_TODO':
-      console.log(action);
       return {
         ...state,
         todos: state.todos.map((todo) => {
@@ -55,7 +51,6 @@ const todosReducer = (state = initState, action) => {
         filteredTodos: action.payload.filteredTodos,
       };
     case 'DELETE_TODO':
-      console.log(action);
       return {
         ...state,
         todos: state.todos.filter((todo) => todo.id !== action.payload.todoId),
@@ -63,21 +58,18 @@ const todosReducer = (state = initState, action) => {
         filteredTodos: action.payload.filteredTodos,
       };
     case 'NEXT_PAGE':
-      console.log(action);
       return {
         ...state,
         currentTodos: action.payload.currentTodos,
         currentPage: action.payload.currentPage,
       };
     case 'PREV_PAGE':
-      console.log(action);
       return {
         ...state,
         currentTodos: action.payload.currentTodos,
         currentPage: action.payload.currentPage,
       };
     case 'FILTER':
-      console.log(action);
       return {
         ...state,
         filter: action.payload.filter,

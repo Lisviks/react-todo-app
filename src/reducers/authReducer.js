@@ -7,7 +7,6 @@ const initState = {
 const authReducer = (state = initState, action) => {
   switch (action.type) {
     case 'LOGIN':
-      console.log(action);
       return {
         ...state,
         user: {
@@ -18,7 +17,6 @@ const authReducer = (state = initState, action) => {
         },
       };
     case 'SIGN_UP':
-      console.log(action);
       return {
         ...state,
         user: {
@@ -29,13 +27,11 @@ const authReducer = (state = initState, action) => {
         loading: false,
       };
     case 'LOGOUT':
-      console.log(action);
       return {
         ...state,
         user: null,
       };
     case 'ONLOAD_LOGIN':
-      console.log(action);
       return {
         ...state,
         user: action.payload.user,
@@ -47,7 +43,6 @@ const authReducer = (state = initState, action) => {
         loading: true,
       };
     case 'SWITCH_AUTH_FORM':
-      console.log(action);
       return {
         ...state,
         loginForm: !state.loginForm,
