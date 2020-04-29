@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { login } from '../actions/authActions';
+import { login, switchForm } from '../actions/authActions';
 
-const LoginForm = ({ showSignUp, login }) => {
+const LoginForm = ({ login, switchForm }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
@@ -20,7 +20,7 @@ const LoginForm = ({ showSignUp, login }) => {
       <button className='btn'>Login</button>
       <span>
         Need account?{' '}
-        <button className='change-form-btn' onClick={showSignUp}>
+        <button className='change-form-btn' onClick={switchForm}>
           Sign up
         </button>
       </span>
@@ -28,6 +28,6 @@ const LoginForm = ({ showSignUp, login }) => {
   );
 };
 
-const mapDispatchToProps = { login };
+const mapDispatchToProps = { login, switchForm };
 
 export default connect(null, mapDispatchToProps)(LoginForm);

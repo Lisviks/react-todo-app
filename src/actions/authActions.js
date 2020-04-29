@@ -56,3 +56,10 @@ export const onloadLogin = (user) => ({
   type: 'ONLOAD_LOGIN',
   payload: { user },
 });
+
+export const switchForm = (e) => {
+  e.preventDefault();
+  return (dispatch) => {
+    dispatch({ type: 'SWITCH_AUTH_FORM' });
+  };
+};

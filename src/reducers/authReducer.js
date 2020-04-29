@@ -1,4 +1,5 @@
 const initState = {
+  loginForm: true,
   user: null,
   loading: true,
 };
@@ -44,6 +45,12 @@ const authReducer = (state = initState, action) => {
       return {
         ...state,
         loading: true,
+      };
+    case 'SWITCH_AUTH_FORM':
+      console.log(action);
+      return {
+        ...state,
+        loginForm: !state.loginForm,
       };
     default:
       return state;

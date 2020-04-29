@@ -10,12 +10,6 @@ import { logout, onloadLogin } from './actions/authActions';
 import { loadTheme, setTheme } from './actions/themeActions';
 
 class App extends Component {
-  state = {
-    darkTheme: false,
-    loginForm: true,
-    loading: true,
-  };
-
   componentDidMount() {
     this.props.loadTheme();
 
@@ -46,18 +40,6 @@ class App extends Component {
     document.querySelector('body').classList.toggle('dark');
   };
 
-  showSignUp = (e) => {
-    e.preventDefault();
-    console.log('showsginup');
-    this.setState({ loginForm: false });
-  };
-
-  showLogin = (e) => {
-    e.preventDefault();
-    console.log('showlogin');
-    this.setState({ loginForm: true });
-  };
-
   render() {
     return (
       <div className='container'>
@@ -82,11 +64,7 @@ class App extends Component {
               </Fragment>
             ) : (
               <Fragment>
-                {this.state.loginForm ? (
-                  <LoginForm showSignUp={this.showSignUp} />
-                ) : (
-                  <SignUpForm showLogin={this.showLogin} />
-                )}
+                {this.props.loginForm ? <LoginForm /> : <SignUpForm />}
               </Fragment>
             )}
           </Fragment>
@@ -97,10 +75,10 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state.theme);
   return {
     user: state.auth.user,
     loading: state.auth.loading,
+    loginForm: state.auth.loginForm,
     theme: state.theme.theme,
   };
 };
