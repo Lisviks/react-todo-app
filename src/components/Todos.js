@@ -19,8 +19,6 @@ class Todos extends Component {
   state = {
     formText: '',
     formState: null,
-    // Loader
-    loading: true,
   };
 
   async componentDidMount() {

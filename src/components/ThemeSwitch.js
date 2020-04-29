@@ -1,10 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { setTheme } from '../actions/themeActions';
 
-const ThemeSwitch = ({ switchTheme, theme }) => {
+const ThemeSwitch = ({ theme, setTheme }) => {
   const currentTheme = () => {
     if (theme === 'light') return false;
     return true;
+  };
+
+  const switchTheme = () => {
+    let newTheme;
+    if (theme === 'light') newTheme = 'dark';
+    if (theme === 'dark') newTheme = 'light';
+    setTheme(newTheme);
   };
 
   return (
@@ -27,4 +35,6 @@ const mapStateToProps = (state) => {
   return { theme: state.theme.theme };
 };
 
-export default connect(mapStateToProps)(ThemeSwitch);
+const mapDispatchToProps = { setTheme };
+
+export default connect(mapStateToProps, mapDispatchToProps)(ThemeSwitch);

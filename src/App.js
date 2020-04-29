@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import Todos from './components/Todos';
 import ThemeSwitch from './components/ThemeSwitch';
 import LoginForm from './components/LoginForm';
@@ -9,70 +9,55 @@ import { connect } from 'react-redux';
 import { logout, onloadLogin } from './actions/authActions';
 import { loadTheme, setTheme } from './actions/themeActions';
 
-class App extends Component {
-  componentDidMount() {
-    this.props.loadTheme();
+const App = (props) => {
+  const { loadTheme, onloadLogin, loading, user, logout, loginForm } = props;
 
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const res = await firestore.collection('users').doc(user.uid).get();
-        const userData = res.data();
+  loadTheme();
 
-        this.props.onloadLogin({
-          id: user.uid,
-          username: userData.username,
-          email: userData.email,
-        });
-      } else {
-        this.props.onloadLogin(null);
-      }
-    });
-  }
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      const res = await firestore.collection('users').doc(user.uid).get();
+      const userData = res.data();
 
-  switchTheme = () => {
-    let theme;
-    if (this.props.theme === 'light') theme = 'dark';
-    if (this.props.theme === 'dark') theme = 'light';
+      onloadLogin({
+        id: user.uid,
+        username: userData.username,
+        email: userData.email,
+      });
+    } else {
+      onloadLogin(null);
+    }
+  });
 
-    this.props.setTheme(theme);
-
-    document.querySelector('body').classList.toggle('light');
-    document.querySelector('body').classList.toggle('dark');
-  };
-
-  render() {
-    return (
-      <div className='container'>
-        {this.props.loading ? (
-          <Loader />
-        ) : (
-          <Fragment>
-            <div className='header'>
-              <ThemeSwitch switchTheme={this.switchTheme} />
-              {this.props.user && (
-                <button className='btn logout-btn' onClick={this.props.logout}>
-                  Logout
-                </button>
-              )}
-            </div>
-            {this.props.user ? (
-              <Fragment>
-                <div className='todo-app'>
-                  <h1>Todo App</h1>
-                  <Todos user={this.props.user} />
-                </div>
-              </Fragment>
-            ) : (
-              <Fragment>
-                {this.props.loginForm ? <LoginForm /> : <SignUpForm />}
-              </Fragment>
+  return (
+    <div className='container'>
+      {loading ? (
+        <Loader />
+      ) : (
+        <Fragment>
+          <div className='header'>
+            <ThemeSwitch />
+            {user && (
+              <button className='btn logout-btn' onClick={logout}>
+                Logout
+              </button>
             )}
-          </Fragment>
-        )}
-      </div>
-    );
-  }
-}
+          </div>
+          {user ? (
+            <div className='todo-app'>
+              <h1>Todo App</h1>
+              <Todos user={user} />
+            </div>
+          ) : loginForm ? (
+            <LoginForm />
+          ) : (
+            <SignUpForm />
+          )}
+        </Fragment>
+      )}
+    </div>
+  );
+};
 
 const mapStateToProps = (state) => {
   return {
