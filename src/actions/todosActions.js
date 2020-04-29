@@ -69,7 +69,11 @@ export const addTodo = (userId, text) => {
 
     dispatch({
       type: 'ADD_TODO',
-      payload: { todo: { ...newTodo, id: res.id }, currentTodos },
+      payload: {
+        todo: { ...newTodo, id: res.id },
+        currentTodos,
+        filteredTodos,
+      },
     });
   };
 };
@@ -131,12 +135,14 @@ export const deleteTodo = (userId, todoId) => {
         .delete();
 
       const state = getState();
-      const todos = [
-        ...state.todos.filteredTodos.filter((todo) => todo.id !== todoId),
-      ];
-      const currentTodos = updateCurrentTodos(todos, state.todos);
+      const todos = state.todos.todos.filter((todo) => todo.id !== todoId);
+      const filteredTodos = filterTodos(state.todos.filter, todos);
+      const currentTodos = updateCurrentTodos(filteredTodos, state.todos);
 
-      dispatch({ type: 'DELETE_TODO', payload: { todoId, currentTodos } });
+      dispatch({
+        type: 'DELETE_TODO',
+        payload: { todoId, currentTodos, filteredTodos },
+      });
     } catch (err) {
       console.log(err);
     }

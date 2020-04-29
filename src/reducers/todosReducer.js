@@ -28,6 +28,7 @@ const todosReducer = (state = initState, action) => {
         ...state,
         todos: [action.payload.todo, ...state.todos],
         currentTodos: action.payload.currentTodos,
+        filteredTodos: action.payload.filteredTodos,
       };
     case 'EDIT_TODO':
       console.log(action);
