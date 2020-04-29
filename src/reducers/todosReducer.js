@@ -60,6 +60,7 @@ const todosReducer = (state = initState, action) => {
         ...state,
         todos: state.todos.filter((todo) => todo.id !== action.payload.todoId),
         currentTodos: action.payload.currentTodos,
+        filteredTodos: action.payload.filteredTodos,
       };
     case 'NEXT_PAGE':
       console.log(action);
