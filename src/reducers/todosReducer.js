@@ -51,6 +51,7 @@ const todosReducer = (state = initState, action) => {
           return todo;
         }),
         currentTodos: action.payload.currentTodos,
+        filteredTodos: action.payload.filteredTodos,
       };
     case 'DELETE_TODO':
       console.log(action);

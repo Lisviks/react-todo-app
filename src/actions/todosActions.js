@@ -112,7 +112,7 @@ export const completeTodo = (userId, todoId, complete) => {
 
       dispatch({
         type: 'COMPLETE_TODO',
-        payload: { todoId, currentTodos, complete },
+        payload: { todoId, currentTodos, filteredTodos, complete },
       });
     } catch (err) {
       console.log(err);
