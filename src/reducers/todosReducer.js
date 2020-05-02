@@ -17,16 +17,12 @@ const todosReducer = (state = initState, action) => {
       return {
         ...state,
         todos: action.payload.todos,
-        currentTodos: action.payload.currentTodos,
-        filteredTodos: action.payload.todos,
         loading: action.payload.loading,
       };
     case 'ADD_TODO':
       return {
         ...state,
         todos: [action.payload.todo, ...state.todos],
-        currentTodos: action.payload.currentTodos,
-        filteredTodos: action.payload.filteredTodos,
       };
     case 'EDIT_TODO':
       return {
@@ -47,15 +43,11 @@ const todosReducer = (state = initState, action) => {
           }
           return todo;
         }),
-        currentTodos: action.payload.currentTodos,
-        filteredTodos: action.payload.filteredTodos,
       };
     case 'DELETE_TODO':
       return {
         ...state,
         todos: state.todos.filter((todo) => todo.id !== action.payload.todoId),
-        currentTodos: action.payload.currentTodos,
-        filteredTodos: action.payload.filteredTodos,
       };
     case 'NEXT_PAGE':
       return {
@@ -73,9 +65,12 @@ const todosReducer = (state = initState, action) => {
       return {
         ...state,
         filter: action.payload.filter,
-        filteredTodos: action.payload.filteredTodos,
-        currentTodos: action.payload.currentTodos,
         currentPage: 1,
+      };
+    case 'FILTER_TODOS':
+      return {
+        ...state,
+        filteredTodos: action.payload,
       };
     case 'SET_PAGE_LIMIT':
       return {

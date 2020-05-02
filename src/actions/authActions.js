@@ -52,10 +52,16 @@ export const logout = () => {
   };
 };
 
-export const onloadLogin = (user) => ({
-  type: 'ONLOAD_LOGIN',
-  payload: { user },
-});
+export const onloadLogin = (user) => {
+  return (dispatch, getState) => {
+    if (!getState().auth.user) {
+      dispatch({
+        type: 'ONLOAD_LOGIN',
+        payload: { user },
+      });
+    }
+  };
+};
 
 export const switchForm = (e) => {
   e.preventDefault();
